@@ -72,8 +72,8 @@ Strategy injection: `src/quality/archetype.ts` → system prompt.
 ### E. Professional surfaces
 - [x] AGPL consistency, SECURITY, CI, README thicken
 - [x] Demo GIF (install → freeze → GO) — `docs/assets/demo.gif` / `npm run demo-gif`
-- [x] First commit (no secrets); push when remote credentials available
-- [ ] npm 1.4.x full publish (maintainer — attempt with npm login)
+- [x] First commit (no secrets) — `7d21be4`; remote `origin` set; push blocked on GitHub auth
+- [ ] npm 1.4.x full publish — prepublish gates green; needs `npm publish --otp <code>`
 - [x] Sponsors file present (`.github/FUNDING.yml`); enable on GitHub after public
 
 ### F. New capabilities (priority order)

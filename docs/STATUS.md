@@ -18,9 +18,11 @@
 See [SCORECARD.md](./SCORECARD.md) · [EVAL_TREND.md](./EVAL_TREND.md) · [IMPROVEMENT_PROGRAM.md](./IMPROVEMENT_PROGRAM.md)
 
 ## Remaining maintainer actions (need human / credentials)
-1. Personal dogfood gate log n≥20 → ≥70% first-call ([DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
-2. Optional Sonnet/GPT eval when those API keys exist
-3. Confirm GitHub About text from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md) after push
+1. `git push -u origin master` (remote set; needs GitHub auth / PAT)
+2. `npm publish --access public --otp <code>` (2FA OTP required; package ready at 1.4.0)
+3. Personal dogfood gate log n≥20 → ≥70% first-call ([DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
+4. Optional Sonnet/GPT eval when those API keys exist
+5. Confirm GitHub About text from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md) after push
 
 ## Origin
 https://share.google/aimode/OvN5swZbE704L26KA
