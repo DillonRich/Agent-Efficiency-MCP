@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PromptMCP — local BYOK agent efficiency</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">PromptMCP</div>
+      <nav>
+        <a href="#how">How it works</a>
+        <a href="#install">Install</a>
+        <a class="btn" href="https://github.com/" rel="noopener">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Open source · local · BYOK</p>
+        <h1>Pause the agent.<br />Approve the intent.</h1>
+        <p class="lede">
+          Messy prompts become dense blueprints in <code>Agent_Efficiency_MCP.md</code>.
+          The agent freezes until you type <strong>GO</strong>. Your API key, your
+          machine — no PromptMCP subscription.
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="#install">Install locally</a>
+          <a class="btn ghost" href="#how">See the loop</a>
+        </div>
+      </section>
+
+      <section id="how" class="panel">
+        <h2>How it works</h2>
+        <ol>
+          <li>Install the MCP and put your DeepSeek / OpenAI / Anthropic key in env.</li>
+          <li>Drop the consumer rule into your project.</li>
+          <li>Prompt as usual — review the blueprint — type <code>GO</code>.</li>
+        </ol>
+        <p class="note">
+          Built for serious vibe coders who already pay for an IDE model and will
+          not add another monthly SaaS fee.
+        </p>
+      </section>
+
+      <section id="install" class="panel">
+        <h2>Install</h2>
+        <pre><code>git clone &lt;repo&gt;
+cd PromptMCP
+npm install &amp;&amp; cp .env.example .env
+# add your API key
+npm run build
+# point Cursor MCP at dist/server.js</code></pre>
+        <p class="note">Full steps in the repository README.</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>PromptMCP · MIT</span>
+      <span>Agent efficiency, not prompt theater</span>
+    </footer>
+  </body>
+</html>

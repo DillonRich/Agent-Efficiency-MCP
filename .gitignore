@@ -1,0 +1,42 @@
+# Dependencies & build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Runtime / local artifacts
+.agent_intent.md
+Agent_Efficiency_MCP.md
+.agent_intent.smoke.md
+Agent_Efficiency_MCP.smoke.md
+*.smoke.md
+*.log
+fixtures/eval/results/
+fixtures/eval/goldens/
+fixtures/dogfood/gate-log.csv
+.DS_Store
+Thumbs.db
+*.promptmcp-bak
+.promptmcp/
+
+# Archived commercial experiments (not part of public product)
+infra/
+services/
+
+# IDE / tooling
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.cursor/
+
+# Coverage / misc
+coverage/
+.turbo/
+tmp/
+temp/

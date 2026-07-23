@@ -1,0 +1,4 @@
+date,host,model,project,expected,outcome,notes
+2026-07-22,cursor,composer,example-app,yes,called,baseline after init
+2026-07-22,cursor,composer,example-app,yes,skipped,plain chat mode
+2026-07-22,cursor,composer,example-app,yes,recovered,/optimize worked

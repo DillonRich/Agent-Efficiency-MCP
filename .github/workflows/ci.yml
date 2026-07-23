@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Smoke (offline)
+        run: npm run smoke
+        env:
+          PROMPT_MCP_SMOKE_OFFLINE: "1"
+      - name: Eval (mock provider)
+        run: npm run eval -- --provider mock
+        env:
+          REWRITE_PROVIDER: mock
+      - name: Flake check (mock ×3)
+        run: npm run flake-check
+        env:
+          REWRITE_PROVIDER: mock
+      - name: Eval trend + context budget
+        run: |
+          npm run eval-trend
+          npm run measure-context

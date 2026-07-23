@@ -1,0 +1,72 @@
+[
+  {
+    "id": "E01",
+    "type": "messy_coding",
+    "prompt": "Hey can you please make a super clean elegant helper that logs hello somehow thanks!!"
+  },
+  {
+    "id": "E02",
+    "type": "planning",
+    "prompt": "For the security tool give me suggested next steps hurdles blockers and what to focus on to make it portfolio ready"
+  },
+  {
+    "id": "E03",
+    "type": "follow_up",
+    "prompt": "Okay very nice expand on the blockers and stuff"
+  },
+  {
+    "id": "E04",
+    "type": "coding_concrete",
+    "prompt": "Add input validation to the login form and show errors under each field"
+  },
+  {
+    "id": "E05",
+    "type": "vague",
+    "prompt": "What should we do next"
+  },
+  {
+    "id": "E06",
+    "type": "negative_ignore",
+    "prompt": "@mcp:ignore what is 2+2"
+  },
+  {
+    "id": "E07",
+    "type": "directives_include_file_long",
+    "prompt": "@promptmcp:include @promptmcp:long @promptmcp:file[package.json, src/server.ts]\nPlease harden the MCP server error handling without inventing files."
+  },
+  {
+    "id": "E08",
+    "type": "directives_test_short",
+    "prompt": "@promptmcp:short @promptmcp:test\nAdd a smoke assertion that the metrics header has no time-saved claims."
+  },
+  {
+    "id": "E09",
+    "type": "overconstrained",
+    "prompt": "You must rewrite the entire engine to be enterprise grade, always use dependency injection, never add tests, must add full test suite, keep it simple, also support every cloud provider, do not touch providers, and make it beautiful and production ready today."
+  },
+  {
+    "id": "E10",
+    "type": "contradictory",
+    "prompt": "Always keep the blueprint short. Never simplify. Add comprehensive documentation everywhere but do not add any docs. No tests but add tests for everything."
+  },
+  {
+    "id": "E11",
+    "type": "long_ramble",
+    "prompt": "So basically I was thinking last night about how the agent sometimes wastes tokens and I talked to a friend and they said maybe we should improve things somehow and I don't know exactly but maybe look at the server and the engine and the context gathering and also the docs and perhaps the install flow and make everything better and cleaner and more professional while keeping all the old behavior and also maybe add some new ideas if they seem good but I'm not sure which ones matter most and also the README could use love and yeah just improve the whole project based on vibes thanks so much!!!"
+  },
+  {
+    "id": "E12",
+    "type": "multi_goal",
+    "prompt": "Add retry logic to HTTP calls and also redesign the README and also migrate the license text and also add a new provider for Cohere as well as refactor the CLI help text."
+  },
+  {
+    "id": "E13",
+    "type": "underspecified_bug",
+    "prompt": "it's broken fix it"
+  },
+  {
+    "id": "E14",
+    "type": "token_waste_risk",
+    "prompt": "Please explore the whole codebase and figure out how everything works then improve whatever needs improving"
+  }
+]

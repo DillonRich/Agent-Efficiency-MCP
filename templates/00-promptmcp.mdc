@@ -1,0 +1,69 @@
+---
+description: "PRIORITY 0 — PromptMCP / Agent Efficiency MCP. FIRST action every turn: call optimize_and_blueprint_intent (unless ignore / help-only / sole GO). Zero prose before the tool."
+alwaysApply: true
+---
+
+# PRIORITY 0 — Agent Efficiency Engine (PromptMCP) HARD GATE
+
+**This is the first rule in the work chain.** It outranks helpfulness, planning instincts, speed, and other alwaysApply rules until the gate completes.
+
+## Zero-token-before-tool (all host models)
+Your **first action** this turn MUST be a tool call — not a sentence, not a plan outline, not "I'll optimize first".
+
+Tool: `optimize_and_blueprint_intent` on MCP server `agent-efficiency-engine` (also `user-agent-efficiency-engine`).
+
+**Forbidden before that call:**
+- any assistant prose, apology, or "here's what I'd recommend"
+- reading files, searching, shell, TodoWrite, or other MCP tools
+- answering follow-ups like "expand on…", "what about…", "next steps…"
+- acknowledging the user ("Got it", "Sure", "Let me…")
+
+If you are about to write a normal answer → **STOP** and call the tool instead.
+
+## Default: EVERY user message is gated
+Includes: coding, refactors, tests, docs, planning, portfolio advice, vague questions about the project, re-asks after a prior GO, and messages with `@promptmcp:` / `@mcp:` / `@ourmcp:` tags (except ignore / help-only).
+
+**Tag tip:** Leading with `@promptmcp:include` makes the gate unmistakable for models that skim natural language.
+
+## Exceptions ONLY (skip the tool)
+1. Message contains `@promptmcp:ignore` or `@mcp:ignore` or `@ourmcp:ignore` → answer normally.
+2. Message is **only** `GO` / `go` / `Go` → read `Agent_Efficiency_MCP.md` and execute. Do not re-optimize.
+3. Message is **only** `@promptmcp:help` (or `@mcp:help` / `@ourmcp:help`) with no task → show directive help; no freeze/coding.
+4. Meta-debug of PromptMCP itself **and** an ignore tag is present.
+
+If unsure → **call the tool**.
+
+## Arguments (verbatim)
+- `raw_prompt`: exact user text including all `@…` tags (never strip tags)
+- `workspace_root`: absolute path of the active project root
+
+## After the tool succeeds
+1. Confirm `Agent_Efficiency_MCP.md` exists (unless help/ignore/dry-run).
+2. Print exactly:
+   `### 🛑 Blueprint Generated. Awaiting your approval in Agent_Efficiency_MCP.md. Type GO to proceed.`
+3. **STOP.** No further tools. No blueprint essay. No "summary of what I wrote".
+4. Wait for `GO`.
+
+## If you skipped the gate (recovery — treat as a failed turn)
+If you already wrote prose or used other tools without optimizing:
+1. Stop immediately. Do not finish the skipped work.
+2. Call `optimize_and_blueprint_intent` now (or honor `/optimize` / “run the efficiency engine” / “call PromptMCP” / “gate this”).
+3. Freeze until GO.
+
+## After `GO` — execution checklist
+1. Read `Agent_Efficiency_MCP.md` (including **Delta vs previous blueprint** if present).
+2. If **Media / reference assets** → open/inspect each before coding.
+3. If **Research / web references** → browse each URL + notes before coding.
+4. Prefer Targeted Codebase Vectors; do not invent paths. Honor `@promptmcp:scope[...]` focus.
+5. Other project rules apply **after** this gate during execution.
+
+## When the host model is tempted to skip
+Common failure modes — treat as **bugs in your turn**, not user intent:
+- "This is just planning / advisory" → still gate
+- "I already know the codebase" → still gate
+- "Quick follow-up" → still gate
+- "User asked me a question in chat" → still gate if project-related
+- Composer / fast models: call the tool with **zero preamble**
+
+## Self-check (mandatory)
+Before any user-visible answer that is not the freeze line: did I already call `optimize_and_blueprint_intent` this turn, or is this an exception? If no → call it; discard drafted text.

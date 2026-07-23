@@ -1,0 +1,30 @@
+{
+  "workspaceRoot": "C:/Users/Dillon/Downloads/PromptMCP",
+  "gitDiff": "src/server.ts\nsrc/engine.ts\nREADME.md",
+  "gitLog": "abc1234 polish context\ndef5678 add directives",
+  "fileTree": "package.json\nREADME.md\nsrc/\ndocs/\ntemplates/\nscripts/",
+  "packageSummary": "name: promptmcp\ndependencies: @modelcontextprotocol/sdk, dotenv, zod\ndevDependencies: typescript, tsx, @types/node",
+  "stackHints": "TypeScript | Node",
+  "docSnippets": "--- README.md ---\nPromptMCP local BYOK MCP",
+  "forcedFileSnippets": "(No forced file contents loaded.)",
+  "knownPaths": [
+    "package.json",
+    "README.md",
+    "src",
+    "src/",
+    "docs",
+    "docs/",
+    "templates",
+    "scripts",
+    "src/server.ts",
+    "src/engine.ts",
+    "src/context.ts",
+    "src/validate.ts",
+    "Agent_Efficiency_MCP.md"
+  ],
+  "forcedFiles": [],
+  "forcedMedia": [],
+  "contextWarnings": [],
+  "contextBytes": 2048,
+  "gitChangedCount": 3
+}
