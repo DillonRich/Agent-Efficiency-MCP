@@ -1,6 +1,19 @@
 # Install
 
-## One command (recommended)
+## Consumer install (npm — recommended)
+
+```bash
+cd /path/to/your/app
+npx agent-efficiency-mcp@latest init --project .
+npx agent-efficiency-mcp@latest configure --project . --provider deepseek --api-key YOUR_KEY --model flash
+# reload MCP / restart IDE
+npx agent-efficiency-mcp@latest doctor --project .
+```
+
+`configure` writes the key into the MCP server `env` block in your IDE config (Cursor/VS Code/…).  
+There is **no** project-root `.env` required for the npx consumer path.
+
+## Contributor / local clone
 
 ```bash
 git clone https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git
@@ -20,7 +33,7 @@ npx agent-efficiency-mcp init --project "C:/path/to/your/app"
 3. **Create** `Agent_Efficiency_MCP.md` at the project root (skipped if it already exists)
 4. Print the **absolute path** of the blueprint file and every config/rules path touched
 
-Restart your IDE / reload MCP after init.
+Restart your IDE / reload MCP after init / configure.
 
 Health check anytime:
 
@@ -50,9 +63,17 @@ npx agent-efficiency-mcp uninstall --project "C:/path/to/your/app"
 ### If the host skips the gate
 Type `/optimize` or say **run the efficiency engine**, then confirm MCP is connected.
 
-### API key
+### API key / model
 
-Put keys in this package’s `.env` (see `.env.example`) or pass via `--env DEEPSEEK_API_KEY=...` into the MCP entry.
+**Preferred (consumers):**
+
+```bash
+npx agent-efficiency-mcp configure --project . --provider deepseek --api-key YOUR_KEY --model flash
+```
+
+Also accepted at init time: `--env DEEPSEEK_API_KEY=...` (repeatable).  
+Or edit the MCP server’s **env** fields in Cursor Settings → MCP.  
+Local clone contributors may still use the package `.env` (see `.env.example`).
 
 ## Manual install
 

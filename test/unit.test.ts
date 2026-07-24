@@ -7,10 +7,12 @@ import { isSafePublicHttpUrl } from "../src/security/ssrf.js";
 import { sanitizeProviderError } from "../src/security/errors.js";
 import {
   buildServerEntry,
+  patchMcpServerEnv,
   removeMcpConfig,
   resolveLaunchMode,
   type HostTarget,
 } from "../src/install/mcp-hosts.js";
+import { buildConfigureEnv } from "../src/configure-env.js";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -162,6 +164,69 @@ describe("mcp launch", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it("patches MCP env for configure without rewriting command", () => {
+    const dir = mkdtempSync(join(tmpdir(), "aee-patch-"));
+    try {
+      const configPath = join(dir, "mcp.json");
+      writeFileSync(
+        configPath,
+        JSON.stringify(
+          {
+            mcpServers: {
+              "agent-efficiency-engine": {
+                command: "npx",
+                args: ["-y", "agent-efficiency-mcp", "serve"],
+              },
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      const target: HostTarget = {
+        id: "test",
+        label: "test",
+        configPath,
+        rootKey: "mcpServers",
+      };
+      const r = patchMcpServerEnv(target, {
+        DEEPSEEK_API_KEY: "sk-test",
+        REWRITE_PROVIDER: "deepseek",
+      });
+      assert.equal(r.status, "updated");
+      const parsed = JSON.parse(readFileSync(configPath, "utf8")) as {
+        mcpServers: {
+          "agent-efficiency-engine": {
+            command: string;
+            env: Record<string, string>;
+          };
+        };
+      };
+      assert.equal(
+        parsed.mcpServers["agent-efficiency-engine"].command,
+        "npx",
+      );
+      assert.equal(
+        parsed.mcpServers["agent-efficiency-engine"].env.DEEPSEEK_API_KEY,
+        "sk-test",
+      );
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("maps configure flags to provider env vars", () => {
+    const env = buildConfigureEnv({
+      provider: "deepseek",
+      apiKey: "sk-abc",
+      model: "flash",
+    });
+    assert.equal(env.REWRITE_PROVIDER, "deepseek");
+    assert.equal(env.DEEPSEEK_API_KEY, "sk-abc");
+    assert.equal(env.REWRITE_MODEL, "flash");
+    assert.equal(env.DEEPSEEK_MODEL, "flash");
   });
 });
 

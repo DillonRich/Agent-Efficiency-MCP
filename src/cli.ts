@@ -2,6 +2,7 @@
 /**
  * Agent Efficiency Engine MCP CLI
  *   agent-efficiency-mcp init [--project <dir>] [--global-only] [--env KEY=VAL ...] [--launch node|npx]
+ *   agent-efficiency-mcp configure [--project <dir>] [--provider ...] [--api-key ...] [--model ...] [--env KEY=VAL ...]
  *   agent-efficiency-mcp serve   (stdio MCP — same as node dist/server.js)
  *   agent-efficiency-mcp doctor [--project <dir>]
  *   agent-efficiency-mcp uninstall [--project <dir>] [--keep-rules]
@@ -17,8 +18,10 @@ import { config as loadEnv } from "dotenv";
 import { BLUEPRINT_FILENAME } from "./constants.js";
 import { starterBlueprintStub, writeAgentIntent } from "./context.js";
 import { formatDoctorReport, runDoctor } from "./doctor.js";
+import { buildConfigureEnv } from "./configure-env.js";
 import {
   mergeMcpConfig,
+  patchMcpServerEnv,
   removeMcpConfig,
   resolveHostTargets,
   resolveLaunchMode,
@@ -53,28 +56,35 @@ function printHelp(): void {
   console.log(`Agent Efficiency Engine MCP v${packageVersion()}
 
 Usage:
-  npx agent-efficiency-mcp init [options]   Install MCP + merge rules + blueprint
-  agent-efficiency-mcp serve               Run MCP server over stdio
-  agent-efficiency-mcp doctor [options]    Check install / keys / rules
-  agent-efficiency-mcp uninstall [options] Remove MCP entry (+ rules unless --keep-rules)
-  agent-efficiency-mcp version             Print version
-  agent-efficiency-mcp help                Show this help
+  npx agent-efficiency-mcp init [options]        Install MCP + merge rules + blueprint
+  npx agent-efficiency-mcp configure [options]   Set API key / provider / model in MCP env
+  agent-efficiency-mcp serve                     Run MCP server over stdio
+  agent-efficiency-mcp doctor [options]          Check install / keys / rules
+  agent-efficiency-mcp uninstall [options]       Remove MCP entry (+ rules unless --keep-rules)
+  agent-efficiency-mcp version                   Print version
+  agent-efficiency-mcp help                      Show this help
   (alias: promptmcp)
 
-Init / uninstall options:
+Init / configure / uninstall options:
   --project <dir>     Target project root (default: cwd)
   --global-only       Only write/remove global IDE configs
-  --skip-hosts        Skip MCP JSON registration
-  --skip-rules        Skip rule merge
-  --skip-blueprint    Skip creating ${BLUEPRINT_FILENAME}
+  --skip-hosts        Skip MCP JSON registration (init)
+  --skip-rules        Skip rule merge (init)
+  --skip-blueprint    Skip creating ${BLUEPRINT_FILENAME} (init)
   --keep-rules        Uninstall: leave PRIORITY 0 rules in place
   --launch node|npx   How hosts start the server (default: node)
                       npx = resilient after moves (needs npm package)
   --env KEY=VALUE     Extra env for MCP server entry (repeatable)
+  --provider <name>   configure: deepseek|openai|anthropic|gemini|xai|local|auto
+  --api-key <key>     configure: sets the matching *_API_KEY for --provider
+  --model <id>        configure: sets REWRITE_MODEL (and provider model when known)
+
+Typical consumer flow:
+  npx agent-efficiency-mcp@latest init --project .
+  npx agent-efficiency-mcp@latest configure --project . --provider deepseek --api-key YOUR_KEY --model flash
+  (reload MCP) then send a task → review ${BLUEPRINT_FILENAME} → type GO
 
 If the host model skips the gate: type /optimize or "run the efficiency engine".
-
-After init, restart your IDE / reload MCP so the server connects.
 `);
 }
 
@@ -88,6 +98,9 @@ function parseArgs(argv: string[]): {
   keepRules: boolean;
   launch: LaunchMode;
   env: Record<string, string>;
+  provider?: string;
+  apiKey?: string;
+  model?: string;
 } {
   const args = argv.slice(2);
   const cmd = (args[0] || "help").toLowerCase();
@@ -98,6 +111,9 @@ function parseArgs(argv: string[]): {
   let skipBlueprint = false;
   let keepRules = false;
   let launch = resolveLaunchMode();
+  let provider: string | undefined;
+  let apiKey: string | undefined;
+  let model: string | undefined;
   const env: Record<string, string> = {};
 
   for (let i = 1; i < args.length; i++) {
@@ -116,6 +132,12 @@ function parseArgs(argv: string[]): {
       keepRules = true;
     } else if (a === "--launch" && args[i + 1]) {
       launch = resolveLaunchMode(args[++i]);
+    } else if (a === "--provider" && args[i + 1]) {
+      provider = args[++i];
+    } else if ((a === "--api-key" || a === "--apikey") && args[i + 1]) {
+      apiKey = args[++i];
+    } else if (a === "--model" && args[i + 1]) {
+      model = args[++i];
     } else if (a === "--env" && args[i + 1]) {
       const kv = args[++i];
       const eq = kv.indexOf("=");
@@ -133,6 +155,9 @@ function parseArgs(argv: string[]): {
     keepRules,
     launch,
     env,
+    provider,
+    apiKey,
+    model,
   };
 }
 
@@ -245,11 +270,12 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
   }
 
   console.log("Done. Next steps:");
-  console.log("  1. Restart Cursor / VS Code / Windsurf / Claude (or reload MCP)");
-  console.log("  2. Confirm server `agent-efficiency-engine` is connected");
+  console.log("  1. Set your BYOK key (writes into MCP env — no project .env required):");
   console.log(
-    "  3. Put your API key in the package `.env` or MCP env block",
+    `     npx agent-efficiency-mcp configure --project "${projectRoot}" --provider deepseek --api-key YOUR_KEY --model flash`,
   );
+  console.log("  2. Restart Cursor / VS Code / Windsurf / Claude (or reload MCP)");
+  console.log("  3. Confirm server `agent-efficiency-engine` is connected");
   console.log(
     `  4. Send a task prompt → review ${BLUEPRINT_FILENAME} → type GO`,
   );
@@ -262,6 +288,70 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
     console.log("Paths touched:");
     for (const p of touched) console.log(`  - ${p}`);
   }
+}
+
+async function runConfigure(opts: ReturnType<typeof parseArgs>): Promise<void> {
+  console.log(`Agent Efficiency Engine — configure (v${packageVersion()})\n`);
+  const projectRoot = path.resolve(opts.project);
+  const env = buildConfigureEnv({
+    provider: opts.provider,
+    apiKey: opts.apiKey,
+    model: opts.model,
+    env: opts.env,
+  });
+
+  if (Object.keys(env).length === 0) {
+    console.error(
+      "Nothing to set. Example:\n" +
+        `  npx agent-efficiency-mcp configure --project "${projectRoot}" --provider deepseek --api-key YOUR_KEY --model flash\n` +
+        "Or pass raw vars: --env DEEPSEEK_API_KEY=... --env REWRITE_PROVIDER=deepseek",
+    );
+    process.exit(1);
+  }
+
+  const targets = resolveHostTargets(projectRoot).filter((t) => {
+    if (opts.globalOnly) {
+      return !t.id.includes("project") && t.id !== "vscode-project";
+    }
+    return true;
+  });
+
+  const redacted = Object.fromEntries(
+    Object.entries(env).map(([k, v]) =>
+      /KEY|TOKEN|SECRET/i.test(k) ? [k, v.slice(0, 4) + "…"] : [k, v],
+    ),
+  );
+  console.log("Applying MCP env:");
+  for (const [k, v] of Object.entries(redacted)) {
+    console.log(`  ${k}=${v}`);
+  }
+  console.log("");
+
+  let updated = 0;
+  for (const t of targets) {
+    // Only patch configs that already exist (init creates them).
+    if (!fs.existsSync(t.configPath)) continue;
+    const result = patchMcpServerEnv(t, env);
+    if (result.status === "updated") {
+      console.log(`  [ok]   ${t.label}`);
+      console.log(`         ${result.path}`);
+      updated += 1;
+    } else if (result.status === "absent") {
+      /* quiet */
+    }
+  }
+
+  if (updated === 0) {
+    console.error(
+      "No MCP configs found to update. Run init first:\n" +
+        `  npx agent-efficiency-mcp init --project "${projectRoot}"`,
+    );
+    process.exit(1);
+  }
+
+  console.log("");
+  console.log("Done. Reload MCP / restart the IDE, then run:");
+  console.log(`  npx agent-efficiency-mcp doctor --project "${projectRoot}"`);
 }
 
 async function runDoctorCmd(opts: ReturnType<typeof parseArgs>): Promise<void> {
@@ -335,6 +425,10 @@ async function main(): Promise<void> {
   const opts = parseArgs(process.argv);
   if (opts.cmd === "init") {
     await runInit(opts);
+    return;
+  }
+  if (opts.cmd === "configure" || opts.cmd === "config" || opts.cmd === "env") {
+    await runConfigure(opts);
     return;
   }
   if (opts.cmd === "serve" || opts.cmd === "start") {

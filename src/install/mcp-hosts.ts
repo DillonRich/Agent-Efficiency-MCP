@@ -245,6 +245,49 @@ export function mergeMcpConfig(
   };
 }
 
+/**
+ * Merge env vars into an existing agent-efficiency-engine MCP entry (keeps command/args).
+ */
+export function patchMcpServerEnv(
+  target: HostTarget,
+  env: Record<string, string>,
+): { path: string; status: "updated" | "absent" | "unchanged" } {
+  if (!fs.existsSync(target.configPath)) {
+    return { path: target.configPath, status: "absent" };
+  }
+  if (Object.keys(env).length === 0) {
+    return { path: path.resolve(target.configPath), status: "unchanged" };
+  }
+
+  const data = readJsonObject(target.configPath);
+  const rootKey = target.rootKey;
+  const servers = data[rootKey];
+  if (!servers || typeof servers !== "object" || Array.isArray(servers)) {
+    return { path: path.resolve(target.configPath), status: "absent" };
+  }
+  const map = { ...(servers as Record<string, unknown>) };
+  const existing = map[MCP_SERVER_KEY];
+  if (!existing || typeof existing !== "object" || Array.isArray(existing)) {
+    return { path: path.resolve(target.configPath), status: "absent" };
+  }
+
+  const entry = { ...(existing as Record<string, unknown>) };
+  const prevEnv =
+    entry.env && typeof entry.env === "object" && !Array.isArray(entry.env)
+      ? { ...(entry.env as Record<string, string>) }
+      : {};
+  entry.env = { ...prevEnv, ...env };
+  map[MCP_SERVER_KEY] = entry;
+  data[rootKey] = map;
+  fs.mkdirSync(path.dirname(target.configPath), { recursive: true });
+  fs.writeFileSync(
+    target.configPath,
+    JSON.stringify(data, null, 2) + "\n",
+    "utf8",
+  );
+  return { path: path.resolve(target.configPath), status: "updated" };
+}
+
 /** Remove only our MCP server key; leave other servers intact. */
 export function removeMcpConfig(
   target: HostTarget,
