@@ -12,10 +12,11 @@ const maxSpread = Number(process.env.PROMPT_MCP_FLAKE_MAX_SPREAD || "5");
 
 const scores: number[] = [];
 for (let i = 0; i < runs; i++) {
+  const tsxCli = join(root, "node_modules", "tsx", "dist", "cli.mjs");
   const r = spawnSync(
-    "npm",
-    ["run", "eval", "--", "--provider", "mock"],
-    { cwd: root, encoding: "utf8", shell: true, env: process.env },
+    process.execPath,
+    [tsxCli, join(root, "scripts/eval-providers.ts"), "--provider", "mock"],
+    { cwd: root, encoding: "utf8", env: { ...process.env, REWRITE_PROVIDER: "mock" } },
   );
   if (r.status !== 0 && r.status !== 2) {
     console.error(r.stderr || r.stdout);

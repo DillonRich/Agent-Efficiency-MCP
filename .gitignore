@@ -20,6 +20,9 @@ Agent_Efficiency_MCP.smoke.md
 fixtures/eval/results/
 fixtures/eval/goldens/
 fixtures/dogfood/gate-log.csv
+fixtures/dogfood/auto-results.json
+fixtures/dogfood/auto-doctor.txt
+fixtures/dogfood/auto-gate-log.csv
 .DS_Store
 Thumbs.db
 *.promptmcp-bak

@@ -18,7 +18,7 @@
       <nav>
         <a href="#how">How it works</a>
         <a href="#install">Install</a>
-        <a class="btn" href="https://github.com/" rel="noopener">GitHub</a>
+        <a class="btn" href="https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP" rel="noopener">GitHub</a>
       </nav>
     </header>
 
@@ -41,7 +41,7 @@
         <h2>How it works</h2>
         <ol>
           <li>Install the MCP and put your DeepSeek / OpenAI / Anthropic key in env.</li>
-          <li>Drop the consumer rule into your project.</li>
+          <li>Run <code>npx agent-efficiency-mcp init</code> (PRIORITY 0 rules + MCP).</li>
           <li>Prompt as usual — review the blueprint — type <code>GO</code>.</li>
         </ol>
         <p class="note">
@@ -52,18 +52,18 @@
 
       <section id="install" class="panel">
         <h2>Install</h2>
-        <pre><code>git clone &lt;repo&gt;
-cd PromptMCP
+        <pre><code>git clone https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git
+cd Agent-Efficiency-MCP
 npm install &amp;&amp; cp .env.example .env
 # add your API key
 npm run build
-# point Cursor MCP at dist/server.js</code></pre>
+npx agent-efficiency-mcp init --project /path/to/your/app</code></pre>
         <p class="note">Full steps in the repository README.</p>
       </section>
     </main>
 
     <footer>
-      <span>PromptMCP · MIT</span>
+      <span>PromptMCP · AGPL-3.0</span>
       <span>Agent efficiency, not prompt theater</span>
     </footer>
   </body>

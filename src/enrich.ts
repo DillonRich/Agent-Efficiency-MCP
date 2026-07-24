@@ -59,10 +59,15 @@ function stripTags(html: string): string {
     .trim();
 }
 
+const MAX_REDIRECT_HOPS = 3;
+
 async function fetchTitleSnippet(
   url: string,
+  hops = 0,
 ): Promise<{ title?: string; snippet?: string; ok: boolean }> {
   try {
+    if (hops > MAX_REDIRECT_HOPS) return { ok: false };
+
     const res = await fetchWithTimeout(
       url,
       {
@@ -77,14 +82,14 @@ async function fetchTitleSnippet(
       enrichTimeoutMs(),
     );
 
-    // Do not follow redirects to private IPs — only accept 2xx on original URL
+    // Do not follow redirects to private IPs — re-check SSRF on each hop
     if (res.status >= 300 && res.status < 400) {
       const loc = res.headers.get("location");
       if (!loc) return { ok: false };
       const abs = new URL(loc, url).toString();
       const safe = isSafePublicHttpUrl(abs);
       if (!safe.ok || !safe.url) return { ok: false };
-      return fetchTitleSnippet(safe.url);
+      return fetchTitleSnippet(safe.url, hops + 1);
     }
 
     if (!res.ok) return { ok: false };

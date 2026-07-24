@@ -38,9 +38,10 @@ Restart your IDE / reload MCP. Details: [docs/INSTALL.md](docs/INSTALL.md).
 
 ### If the model skips the gate
 Host models can ignore tools. Recovery:
-1. Type `/optimize` or say **“run the efficiency engine”**
-2. Confirm `agent-efficiency-engine` is connected in MCP settings
-3. Run `agent-efficiency-mcp doctor --project .`
+1. Type `/optimize`, or say **“run the efficiency engine”**, **“call PromptMCP”**, or **“gate this prompt”**
+2. Lead the next task with `@promptmcp:include` so the tag is hard to miss
+3. Confirm `agent-efficiency-engine` is connected in MCP settings
+4. Run `agent-efficiency-mcp doctor --project .`
 
 ## Loop
 1. You type a messy task (optionally with `@promptmcp:` directives)

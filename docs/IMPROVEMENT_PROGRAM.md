@@ -66,8 +66,9 @@ Strategy injection: `src/quality/archetype.ts` → system prompt.
 
 ### D. Host gate success (soft)
 - [x] PRIORITY 0 rules + /optimize + zero-token-before-tool + doctor refresh check
-- [x] Dogfood log template + `npm run dogfood-summary` ([docs/DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
-- [ ] Target: ≥ 70% first-call gate rate on Cursor Agent in personal dogfood (n≥20) — maintainer turns
+- [x] Dogfood log template + `npm run dogfood-summary` + `npm run auto-dogfood` (offline product-loop)
+- [x] Contract/install tests (ignore/help/dry-run/freeze/history/vision/MCP merge)
+- [ ] Target: ≥ 70% first-call gate rate on Cursor Agent in **personal** dogfood (n≥20) — still human
 
 ### E. Professional surfaces
 - [x] AGPL consistency, SECURITY, CI, README thicken

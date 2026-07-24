@@ -24,7 +24,7 @@ With a BYOK key in `.env`, smoke also performs a live optimize and writes `Agent
 1. `npm run build` in PromptMCP
 2. Create `.env` with `DEEPSEEK_API_KEY`
 3. Register MCP in Cursor (see root README)
-4. Open a **different** project; paste [templates/consumer-cursorrules.md](../templates/consumer-cursorrules.md)
+4. Open a **different** project; run `npx agent-efficiency-mcp init --project <dir>` (installs `templates/00-promptmcp.mdc`)
 5. Ensure PromptMCP shows as connected/enabled
 
 ### Cases

@@ -21,4 +21,4 @@
 - Default model: `deepseek-v4-flash` (legacy `deepseek-chat` deprecated 2026-07-24)
 
 ## Internal templates
-- Consumer IDE rules: `templates/consumer-cursorrules.md`
+- Consumer IDE rules: `templates/00-promptmcp.mdc` (via `npx agent-efficiency-mcp init`)

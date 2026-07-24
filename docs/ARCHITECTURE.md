@@ -38,7 +38,7 @@
 | Rewrite engine | `src/engine.ts` + `src/providers/*` | Provider switch + validate |
 | Context gatherer | `src/context.ts` | `workspace_root` resolve, git/fs, atomic write |
 | Validator | `src/validate.ts` | Required sections, path allowlist, strip code fences |
-| Consumer rules | `templates/consumer-cursorrules.md` | Copied into *target* projects |
+| Consumer rules | `templates/00-promptmcp.mdc` | Installed by `init` into `.cursor/rules/` |
 | Env config | `.env` / MCP `env` | BYOK provider keys (`REWRITE_PROVIDER=auto` …) |
 | Blueprint artifact | `Agent_Efficiency_MCP.md` (runtime, gitignored) | Human + agent HUD |
 

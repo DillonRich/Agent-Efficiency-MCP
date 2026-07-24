@@ -2,7 +2,14 @@
 
 Manual tracking for host soft-gate success (MCP cannot force tool calls).
 
-## How to use
+## Automated dogfood (offline)
+```bash
+npm run auto-dogfood
+```
+Runs install → doctor → mock optimize turns for all eval cases → freeze contract checks → `dogfood-summary` on a synthetic CSV.  
+**Important:** synthetic host outcomes prove tooling + product loop; they do **not** replace personal Cursor first-call logging.
+
+## How to use (personal / real host)
 1. Copy [`fixtures/dogfood/gate-log.template.csv`](../fixtures/dogfood/gate-log.template.csv) to `fixtures/dogfood/gate-log.csv` (gitignored).
 2. For each real Cursor/Claude/VS Code turn that *should* have gated, add a row.
 3. After ≥20 rows, compute first-call rate:

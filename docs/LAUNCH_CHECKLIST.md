@@ -5,7 +5,7 @@ Commercial launch / Stripe items are retired. Use this for GitHub-ready local re
 ## Before first public push
 - [ ] Confirm `.env` is **not** staged (`git status` / `git check-ignore .env`)
 - [ ] Rotate any keys that ever appeared in chat/terminals
-- [ ] `npm run build && npm test && npm run quality-loop`
+- [ ] `npm run build && npm test && npm run auto-dogfood && npm run quality-loop`
 - [ ] Set GitHub About from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md)
 - [ ] Private push first, then public when ready
 

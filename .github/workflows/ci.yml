@@ -19,10 +19,10 @@ jobs:
         run: npm ci
       - name: Typecheck
         run: npm run typecheck
-      - name: Unit tests
-        run: npm test
       - name: Build
         run: npm run build
+      - name: Unit + contract tests
+        run: npm test
       - name: Smoke (offline)
         run: npm run smoke
         env:
@@ -39,3 +39,13 @@ jobs:
         run: |
           npm run eval-trend
           npm run measure-context
+      - name: Automated dogfood (offline)
+        run: npm run auto-dogfood
+        env:
+          REWRITE_PROVIDER: mock
+          PROMPT_MCP_SMOKE_OFFLINE: "1"
+      - name: Quality loop (offline)
+        run: npm run quality-loop
+        env:
+          REWRITE_PROVIDER: mock
+          PROMPT_MCP_SMOKE_OFFLINE: "1"

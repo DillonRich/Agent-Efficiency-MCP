@@ -255,7 +255,7 @@ What happens:
 ## Tips
 
 - Always pass the **full message verbatim** to the MCP tool (including `@…` tags). Do not strip them before the call.
-- Copy consumer rules from [`templates/consumer-cursorrules.md`](../templates/consumer-cursorrules.md) so the host respects `ignore` / `GO` / freeze.
+- Run `npx agent-efficiency-mcp init` so PRIORITY 0 rules (`templates/00-promptmcp.mdc`) are installed and the host respects `ignore` / `GO` / freeze.
 - Paths are relative to the project `workspace_root` unless absolute.
 - Missing forced files on disk still appear in the blueprint, with a warning that they were not found.
 

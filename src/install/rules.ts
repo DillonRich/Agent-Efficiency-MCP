@@ -67,8 +67,10 @@ export function mergeLegacyRuleFiles(projectRoot: string): string[] {
     "",
     "ZERO TOKENS BEFORE TOOL: first action = call `optimize_and_blueprint_intent` with verbatim user text + absolute workspace_root.",
     "No greeting/plan/other tools first. Then freeze until GO. On GO, execute `Agent_Efficiency_MCP.md` (open Media / Research when listed).",
-    "Recovery: `/optimize` or “run the efficiency engine” / “call PromptMCP”.",
-    "Bypass only: `@promptmcp:ignore`. Help: `@promptmcp:help`. Tip: lead with `@promptmcp:include`.",
+    "Exceptions only: `@promptmcp:ignore` (answer normally); sole word `GO` (execute blueprint); sole `@promptmcp:help` (cheat-sheet, no freeze).",
+    "Recovery if you already wrote prose/tools without gating: STOP → call the tool now. Phrases: `/optimize`, “run the efficiency engine”, “call PromptMCP”, “gate this prompt”.",
+    "Self-check before any non-freeze reply: did I call `optimize_and_blueprint_intent` this turn (or hit an exception)? If no → call it.",
+    "Tip: lead messy prompts with `@promptmcp:include`.",
     "Full Cursor rules: `.cursor/rules/00-promptmcp.mdc`",
     "Host tips: `.promptmcp/hosts/` (claude, vscode-copilot, windsurf, cursor)",
   ].join("\n");

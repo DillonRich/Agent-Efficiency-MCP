@@ -14,7 +14,7 @@ Expanded roadmap: gate reliability via merge-safe PRIORITY 0 rules; rich workspa
 ## 2026-07-22 — Composable @promptmcp: directives
 **Status:** Accepted  
 
-User-facing tags (`ignore`, `include`, `file`, `media`, `search`, `long`, `short`, `test`, `tone`, plus `diff` / `strict` / `help`) parse from `raw_prompt`. Canonical prefix `@promptmcp:`; aliases `@mcp:` and `@ourmcp:`. Media/search are blueprint force-includes for post-GO host action (no MCP vision/browse in v1). Combinations merge; `long` wins over `short`.
+User-facing tags (`ignore`, `include`, `file`, `media`, `search`, `long`, `short`, `test`, `tone`, plus `diff` / `strict` / `help`) parse from `raw_prompt`. Canonical prefix `@promptmcp:`; aliases `@mcp:` and `@ourmcp:`. Media/search are blueprint force-includes for post-GO host action. **Update (1.4.0):** vision-capable providers also receive image bytes during rewrite (`src/vision.ts`); DeepSeek still relies on path forcing for post-GO IDE inspection. Combinations merge; `long` wins over `short`.
 
 ---
 
@@ -163,9 +163,9 @@ One tool `optimize_and_blueprint_intent`. Separate precision/cost tools deferred
 ---
 
 ## 2026-07-21 — Subscription / quota monetization (not per-prompt invoices)
-**Status:** Accepted  
+**Status:** Superseded (by OSS BYOK pivot)  
 
-Per-prompt $0.02 billing is hostile to Stripe fee structure and UX. Future: tiers or prepaid wallet.
+Per-prompt $0.02 billing was hostile to Stripe fee structure and UX. Tier / prepaid-wallet ideas are **cancelled** with the SaaS plan. Shipping path is local BYOK; proprietary use → dual-license contact in [COMMERCIAL.md](./COMMERCIAL.md).
 
 ---
 
