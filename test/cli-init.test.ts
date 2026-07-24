@@ -98,7 +98,13 @@ describe("CLI init / uninstall / doctor", () => {
       );
       assert.equal(init2.status, 0, init2.stderr + init2.stdout);
       mkdirSync(join(project, ".promptmcp", "hosts"), { recursive: true });
+      mkdirSync(join(project, ".promptmcp", "history"), { recursive: true });
       writeFileSync(join(project, ".promptmcp", "hosts", "tip.md"), "x\n");
+      writeFileSync(join(project, ".promptmcp", "history", "old.md"), "y\n");
+      writeFileSync(
+        join(project, "Agent_Efficiency_MCP.smoke.md"),
+        "# smoke\n",
+      );
 
       const uninstallPurge = spawnSync(
         process.execPath,
@@ -107,7 +113,8 @@ describe("CLI init / uninstall / doctor", () => {
       );
       assert.equal(uninstallPurge.status, 0, uninstallPurge.stderr);
       assert.ok(!existsSync(join(project, "Agent_Efficiency_MCP.md")));
-      assert.ok(!existsSync(join(project, ".promptmcp", "hosts")));
+      assert.ok(!existsSync(join(project, "Agent_Efficiency_MCP.smoke.md")));
+      assert.ok(!existsSync(join(project, ".promptmcp")));
     } finally {
       rmSync(project, { recursive: true, force: true });
     }

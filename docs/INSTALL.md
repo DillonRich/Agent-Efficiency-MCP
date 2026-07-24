@@ -84,11 +84,11 @@ Local **package clone** contributors may use the package’s own `.env` (see `.e
 
 ```bash
 npx agent-efficiency-mcp uninstall --project .
-# full project cleanup (blueprint + .promptmcp/hosts):
+# full project cleanup (blueprint .md + entire .promptmcp/):
 npx agent-efficiency-mcp uninstall --project . --purge
 ```
 
-Removes the `agent-efficiency-engine` MCP entry (**including its env keys**), PRIORITY 0 rules, and with `--purge` the blueprint + host tip files. Does not touch your app `.env` or other MCP servers.
+Removes the `agent-efficiency-engine` MCP entry (**including its env keys**), PRIORITY 0 rules, and with `--purge`: `Agent_Efficiency_MCP.md`, all of `.promptmcp/` (host tips + history), empty mcp.json husks. Does not touch your app `.env`, `README.md`, or other MCP servers. Requires package **≥1.4.2** (`--purge` is ignored on 1.4.0).
 
 ## Manual install
 

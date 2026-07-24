@@ -22,6 +22,7 @@ import { buildConfigureEnv } from "./configure-env.js";
 import {
   mergeMcpConfig,
   patchMcpServerEnv,
+  removeEmptyMcpConfigFile,
   removeMcpConfig,
   resolveHostTargets,
   resolveLaunchMode,
@@ -79,7 +80,7 @@ Init / configure / uninstall options:
   --api-key <key>     configure: sets the matching *_API_KEY for --provider
   --model <id>        configure: sets REWRITE_MODEL (and provider model when known)
   --also-global       configure: also write keys into ~/.cursor/mcp.json (default: project only)
-  --purge             uninstall: also delete blueprint + .promptmcp/ hosts (project)
+  --purge             uninstall: delete blueprint .md(s), entire .promptmcp/, empty mcp husks
 
 Keys are stored in the MCP server env block (mcp.json) — we never create or edit your app's .env.
 
@@ -433,29 +434,44 @@ async function runUninstall(opts: ReturnType<typeof parseArgs>): Promise<void> {
 
   if (opts.purge) {
     console.log("\n--purge: removing PromptMCP project files…");
-    const blueprint = path.join(projectRoot, BLUEPRINT_FILENAME);
-    if (fs.existsSync(blueprint)) {
-      fs.unlinkSync(blueprint);
-      console.log(`  [ok]   Deleted ${blueprint}`);
-      touched.push(path.resolve(blueprint));
+    // Known root markdown artifacts we create (never wipe arbitrary *.md).
+    const rootMarkdown = [
+      path.join(projectRoot, BLUEPRINT_FILENAME),
+      path.join(projectRoot, "Agent_Efficiency_MCP.smoke.md"),
+    ];
+    for (const p of rootMarkdown) {
+      if (fs.existsSync(p) && fs.statSync(p).isFile()) {
+        fs.unlinkSync(p);
+        console.log(`  [ok]   Deleted ${p}`);
+        touched.push(path.resolve(p));
+      }
     }
-    const hostsDir = path.join(projectRoot, ".promptmcp", "hosts");
-    if (fs.existsSync(hostsDir)) {
-      fs.rmSync(hostsDir, { recursive: true, force: true });
-      console.log(`  [ok]   Deleted ${hostsDir}`);
-      touched.push(path.resolve(hostsDir));
-    }
+
+    // Entire data dir: hosts/*.md, history/, etc.
     const promptmcpDir = path.join(projectRoot, ".promptmcp");
     if (fs.existsSync(promptmcpDir)) {
+      fs.rmSync(promptmcpDir, { recursive: true, force: true });
+      console.log(`  [ok]   Deleted ${promptmcpDir}`);
+      touched.push(path.resolve(promptmcpDir));
+    }
+
+    // Empty mcp.json husks left after removing our only server entry
+    for (const t of targets) {
+      if (removeEmptyMcpConfigFile(t.configPath)) {
+        console.log(`  [ok]   Deleted empty ${t.configPath}`);
+        touched.push(path.resolve(t.configPath));
+      }
+    }
+
+    // Drop empty IDE dirs we may have created (rules/, .cursor/, .vscode/)
+    for (const rel of [".cursor/rules", ".cursor", ".vscode"]) {
+      const dir = path.join(projectRoot, ...rel.split("/"));
+      if (!fs.existsSync(dir)) continue;
       try {
-        const left = fs.readdirSync(promptmcpDir);
-        if (left.length === 0) {
-          fs.rmdirSync(promptmcpDir);
-          console.log(`  [ok]   Deleted empty ${promptmcpDir}`);
-        } else {
-          console.log(
-            `  [info] Left ${promptmcpDir} (still contains: ${left.join(", ")})`,
-          );
+        if (fs.readdirSync(dir).length === 0) {
+          fs.rmdirSync(dir);
+          console.log(`  [ok]   Deleted empty ${dir}`);
+          touched.push(path.resolve(dir));
         }
       } catch {
         /* ignore */

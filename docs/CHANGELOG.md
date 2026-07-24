@@ -5,8 +5,9 @@ Newest first.
 ## 2026-07-24 — 1.4.2 Env security + clean uninstall
 - Confirmed: consumers never get a project `.env` from us; keys live only in the MCP server `env` block (`mcp.json`)
 - `configure` defaults to **project** MCP configs; `--also-global` opt-in for `~/.cursor/mcp.json`
-- `uninstall --purge` deletes blueprint + `.promptmcp/hosts` (MCP entry removal already drops PromptMCP env keys)
+- `uninstall --purge` deletes blueprint `.md`(s), the entire `.promptmcp/` tree (hosts + history), empty mcp.json husks, and empty `.cursor/rules`
 - Docs/doctor clarify we never append to the app’s `.env`
+- Note: npm `@latest` must be ≥1.4.2 for `--purge` (1.4.0 silently ignored the flag)
 
 ## 2026-07-22 — 1.4.0 Professional hardening
 - AGPL-3.0-only + commercial dual-license docs consistency

@@ -314,3 +314,34 @@ export function removeMcpConfig(
   );
   return { path: path.resolve(target.configPath), status: "removed" };
 }
+
+/**
+ * If a host mcp.json has no servers left (and no other top-level keys besides
+ * the empty servers map), delete the file so uninstall --purge leaves no husk.
+ */
+export function removeEmptyMcpConfigFile(configPath: string): boolean {
+  if (!fs.existsSync(configPath)) return false;
+  try {
+    const data = readJsonObject(configPath);
+    const keys = Object.keys(data);
+    if (keys.length === 0) {
+      fs.unlinkSync(configPath);
+      return true;
+    }
+    if (keys.length === 1) {
+      const only = data[keys[0]!];
+      if (
+        only &&
+        typeof only === "object" &&
+        !Array.isArray(only) &&
+        Object.keys(only as object).length === 0
+      ) {
+        fs.unlinkSync(configPath);
+        return true;
+      }
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
