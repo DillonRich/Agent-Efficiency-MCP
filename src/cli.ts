@@ -353,12 +353,15 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
     '     Optional: --effort none|low|medium|high|max  --thinking on|off  --max-tokens 8192',
   );
   console.log(
+    "     Names are flexible (smart mapping): Deep Seek ≈ deepseek, flash ≈ deepseek-v4-flash, etc.",
+  );
+  console.log(
     '     Examples: --provider "Deep Seek" --model flash   or   --model "pro:max"',
   );
   console.log("  2. Restart / reload MCP in your IDE");
   console.log("  3. Confirm server `agent-efficiency-engine` is connected");
   console.log(
-    `  4. Send a task prompt → review ${BLUEPRINT_FILENAME} → type GO`,
+    `  4. Send a prompt → review ${BLUEPRINT_FILENAME} → type GO`,
   );
   console.log(
     '  5. If the model skips the gate: /optimize or "run the efficiency engine"',

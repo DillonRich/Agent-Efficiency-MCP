@@ -2,6 +2,10 @@
 
 Newest first.
 
+## 2026-07-24 — 1.4.5 Init copy polish
+- Next-steps note smart provider/model name mapping
+- Step 4: “Send a prompt” (drop “task”)
+
 ## 2026-07-24 — 1.4.4 Cursor-only default + durable npx launch
 - `--hosts auto` is **Cursor only** (no `.vscode` dual-write); use `--hosts all` for multi-IDE
 - Removes leftover `.vscode/mcp.json` that only contained our server
