@@ -77,7 +77,7 @@ export function runDoctor(options: {
     findings.push({
       level: "fail",
       message:
-        "No provider key/local endpoint in process env. Add DEEPSEEK_API_KEY (or another) to package .env or MCP env.",
+        "No provider key/local endpoint in process env. Run: agent-efficiency-mcp configure --project <dir> --provider deepseek --api-key … (writes MCP env; never touches your app .env).",
     });
   }
 

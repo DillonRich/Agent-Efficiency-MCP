@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-07-24 — 1.4.2 Env security + clean uninstall
+- Confirmed: consumers never get a project `.env` from us; keys live only in the MCP server `env` block (`mcp.json`)
+- `configure` defaults to **project** MCP configs; `--also-global` opt-in for `~/.cursor/mcp.json`
+- `uninstall --purge` deletes blueprint + `.promptmcp/hosts` (MCP entry removal already drops PromptMCP env keys)
+- Docs/doctor clarify we never append to the app’s `.env`
+
 ## 2026-07-22 — 1.4.0 Professional hardening
 - AGPL-3.0-only + commercial dual-license docs consistency
 - Provider HTTP retries / redacted errors; SSRF guards; workspace path confinement

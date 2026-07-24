@@ -33,7 +33,7 @@ npx agent-efficiency-mcp init --project . --launch npx
 
 ## Uninstall
 ```bash
-npx agent-efficiency-mcp uninstall --project .
+npx agent-efficiency-mcp uninstall --project . --purge
 # keep rules: --keep-rules
 ```
 

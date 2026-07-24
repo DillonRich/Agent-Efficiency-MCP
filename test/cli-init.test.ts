@@ -66,17 +66,48 @@ describe("CLI init / uninstall / doctor", () => {
       );
       assert.match(doctor.stdout, /PRIORITY 0/i);
 
-      const uninstallRules = spawnSync(
+      const uninstallKeepBlueprint = spawnSync(
         process.execPath,
         [cliJs, "uninstall", "--project", project],
         { encoding: "utf8", cwd: root },
       );
-      assert.equal(uninstallRules.status, 0, uninstallRules.stderr);
+      assert.equal(
+        uninstallKeepBlueprint.status,
+        0,
+        uninstallKeepBlueprint.stderr,
+      );
       assert.ok(
         !existsSync(join(project, ".cursor", "rules", "00-promptmcp.mdc")),
       );
-      // blueprint kept by design
+      // blueprint kept without --purge
       assert.ok(existsSync(join(project, "Agent_Efficiency_MCP.md")));
+
+      // re-init then purge
+      const init2 = spawnSync(
+        process.execPath,
+        [
+          cliJs,
+          "init",
+          "--project",
+          project,
+          "--skip-hosts",
+          "--launch",
+          "node",
+        ],
+        { encoding: "utf8", cwd: root, env: { ...process.env } },
+      );
+      assert.equal(init2.status, 0, init2.stderr + init2.stdout);
+      mkdirSync(join(project, ".promptmcp", "hosts"), { recursive: true });
+      writeFileSync(join(project, ".promptmcp", "hosts", "tip.md"), "x\n");
+
+      const uninstallPurge = spawnSync(
+        process.execPath,
+        [cliJs, "uninstall", "--project", project, "--purge"],
+        { encoding: "utf8", cwd: root },
+      );
+      assert.equal(uninstallPurge.status, 0, uninstallPurge.stderr);
+      assert.ok(!existsSync(join(project, "Agent_Efficiency_MCP.md")));
+      assert.ok(!existsSync(join(project, ".promptmcp", "hosts")));
     } finally {
       rmSync(project, { recursive: true, force: true });
     }

@@ -21,6 +21,7 @@ Serious builders already pay for Cursor / Claude / Copilot. This adds a **pause-
 # After npm publish (preferred):
 npx agent-efficiency-mcp@latest init --project "C:/path/to/your/app"
 npx agent-efficiency-mcp@latest configure --project "C:/path/to/your/app" --provider deepseek --api-key YOUR_KEY --model flash
+# Keys go in MCP mcp.json env (not your app's .env)
 
 # Or from a local clone:
 git clone https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git
@@ -86,7 +87,7 @@ npm run doctor
 npm run quality-loop   # offline gates + mock eval + trend
 ```
 
-Troubleshooting: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) · Uninstall: `npx agent-efficiency-mcp uninstall --project .`
+Troubleshooting: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) · Uninstall: `npx agent-efficiency-mcp uninstall --project . --purge`
 
 ## Sponsors
 GitHub Sponsors will be enabled when the project goes public — thank you for supporting independent tools.

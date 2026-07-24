@@ -78,6 +78,10 @@ Init / configure / uninstall options:
   --provider <name>   configure: deepseek|openai|anthropic|gemini|xai|local|auto
   --api-key <key>     configure: sets the matching *_API_KEY for --provider
   --model <id>        configure: sets REWRITE_MODEL (and provider model when known)
+  --also-global       configure: also write keys into ~/.cursor/mcp.json (default: project only)
+  --purge             uninstall: also delete blueprint + .promptmcp/ hosts (project)
+
+Keys are stored in the MCP server env block (mcp.json) — we never create or edit your app's .env.
 
 Typical consumer flow:
   npx agent-efficiency-mcp@latest init --project .
@@ -101,6 +105,8 @@ function parseArgs(argv: string[]): {
   provider?: string;
   apiKey?: string;
   model?: string;
+  alsoGlobal: boolean;
+  purge: boolean;
 } {
   const args = argv.slice(2);
   const cmd = (args[0] || "help").toLowerCase();
@@ -110,6 +116,8 @@ function parseArgs(argv: string[]): {
   let skipRules = false;
   let skipBlueprint = false;
   let keepRules = false;
+  let alsoGlobal = false;
+  let purge = false;
   let launch = resolveLaunchMode();
   let provider: string | undefined;
   let apiKey: string | undefined;
@@ -122,6 +130,10 @@ function parseArgs(argv: string[]): {
       project = path.resolve(args[++i]);
     } else if (a === "--global-only") {
       globalOnly = true;
+    } else if (a === "--also-global") {
+      alsoGlobal = true;
+    } else if (a === "--purge") {
+      purge = true;
     } else if (a === "--skip-hosts") {
       skipHosts = true;
     } else if (a === "--skip-rules") {
@@ -158,6 +170,8 @@ function parseArgs(argv: string[]): {
     provider,
     apiKey,
     model,
+    alsoGlobal,
+    purge,
   };
 }
 
@@ -309,11 +323,19 @@ async function runConfigure(opts: ReturnType<typeof parseArgs>): Promise<void> {
     process.exit(1);
   }
 
+  // Default: project MCP configs only (avoid putting secrets in ~/.cursor for every repo).
   const targets = resolveHostTargets(projectRoot).filter((t) => {
     if (opts.globalOnly) {
-      return !t.id.includes("project") && t.id !== "vscode-project";
+      return t.id === "cursor-global";
     }
-    return true;
+    if (opts.alsoGlobal) {
+      return (
+        t.id === "cursor-project" ||
+        t.id === "vscode-project" ||
+        t.id === "cursor-global"
+      );
+    }
+    return t.id === "cursor-project" || t.id === "vscode-project";
   });
 
   const redacted = Object.fromEntries(
@@ -321,7 +343,9 @@ async function runConfigure(opts: ReturnType<typeof parseArgs>): Promise<void> {
       /KEY|TOKEN|SECRET/i.test(k) ? [k, v.slice(0, 4) + "…"] : [k, v],
     ),
   );
-  console.log("Applying MCP env:");
+  console.log(
+    "Applying MCP env (mcp.json server env — never touches your app .env):",
+  );
   for (const [k, v] of Object.entries(redacted)) {
     console.log(`  ${k}=${v}`);
   }
@@ -399,9 +423,50 @@ async function runUninstall(opts: ReturnType<typeof parseArgs>): Promise<void> {
     console.log("\nKeeping rules (--keep-rules)");
   }
 
+  // Removing the MCP server entry also removes its env block (API keys) from that JSON.
   console.log(
-    `\nBlueprint file ${BLUEPRINT_FILENAME} left in place (delete manually if desired).`,
+    "\nNote: MCP server entry removed → PromptMCP env keys in that mcp.json are gone.",
   );
+  console.log(
+    "We never edit your app .env; no .env lines to scrub.",
+  );
+
+  if (opts.purge) {
+    console.log("\n--purge: removing PromptMCP project files…");
+    const blueprint = path.join(projectRoot, BLUEPRINT_FILENAME);
+    if (fs.existsSync(blueprint)) {
+      fs.unlinkSync(blueprint);
+      console.log(`  [ok]   Deleted ${blueprint}`);
+      touched.push(path.resolve(blueprint));
+    }
+    const hostsDir = path.join(projectRoot, ".promptmcp", "hosts");
+    if (fs.existsSync(hostsDir)) {
+      fs.rmSync(hostsDir, { recursive: true, force: true });
+      console.log(`  [ok]   Deleted ${hostsDir}`);
+      touched.push(path.resolve(hostsDir));
+    }
+    const promptmcpDir = path.join(projectRoot, ".promptmcp");
+    if (fs.existsSync(promptmcpDir)) {
+      try {
+        const left = fs.readdirSync(promptmcpDir);
+        if (left.length === 0) {
+          fs.rmdirSync(promptmcpDir);
+          console.log(`  [ok]   Deleted empty ${promptmcpDir}`);
+        } else {
+          console.log(
+            `  [info] Left ${promptmcpDir} (still contains: ${left.join(", ")})`,
+          );
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  } else {
+    console.log(
+      `\nBlueprint ${BLUEPRINT_FILENAME} and .promptmcp/ left in place (use --purge to delete).`,
+    );
+  }
+
   console.log("Restart your IDE / reload MCP after uninstall.\n");
   if (touched.length) {
     console.log("Paths touched:");

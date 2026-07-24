@@ -63,17 +63,32 @@ npx agent-efficiency-mcp uninstall --project "C:/path/to/your/app"
 ### If the host skips the gate
 Type `/optimize` or say **run the efficiency engine**, then confirm MCP is connected.
 
-### API key / model
+### API key / model (security model)
 
-**Preferred (consumers):**
+**We do not create or edit your app’s `.env`.** Mixing rewrite keys into an application secrets file is risky and surprising.
+
+Keys go in the **MCP server `env` block** inside IDE config (`mcp.json`) — scoped to the PromptMCP server entry only:
 
 ```bash
 npx agent-efficiency-mcp configure --project . --provider deepseek --api-key YOUR_KEY --model flash
 ```
 
-Also accepted at init time: `--env DEEPSEEK_API_KEY=...` (repeatable).  
-Or edit the MCP server’s **env** fields in Cursor Settings → MCP.  
-Local clone contributors may still use the package `.env` (see `.env.example`).
+- Default: project MCP configs only (`.cursor/mcp.json`, `.vscode/mcp.json`)
+- Optional: `--also-global` to also write `~/.cursor/mcp.json` (avoid unless you want the key for every workspace)
+- Also accepted at init: `--env DEEPSEEK_API_KEY=...`
+- Or edit Cursor Settings → MCP → server env UI
+
+Local **package clone** contributors may use the package’s own `.env` (see `.env.example`) — that is the Agent Efficiency repo, not the consumer app.
+
+### Uninstall
+
+```bash
+npx agent-efficiency-mcp uninstall --project .
+# full project cleanup (blueprint + .promptmcp/hosts):
+npx agent-efficiency-mcp uninstall --project . --purge
+```
+
+Removes the `agent-efficiency-engine` MCP entry (**including its env keys**), PRIORITY 0 rules, and with `--purge` the blueprint + host tip files. Does not touch your app `.env` or other MCP servers.
 
 ## Manual install
 
