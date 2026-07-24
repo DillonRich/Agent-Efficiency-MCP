@@ -89,8 +89,11 @@ export function mergeLegacyRuleFiles(projectRoot: string): string[] {
   return written;
 }
 
-/** Copy multi-host guidance markdown into the project (additive). */
-export function installHostGuidance(projectRoot: string): string[] {
+/** Copy host guidance markdown into the project (additive; filtered by hosts mode). */
+export function installHostGuidance(
+  projectRoot: string,
+  hostsMode: "auto" | "cursor" | "vscode" | "all" = "auto",
+): string[] {
   const written: string[] = [];
   const srcDirCandidates = [
     path.join(here, "..", "..", "templates", "hosts"),
@@ -105,10 +108,18 @@ export function installHostGuidance(projectRoot: string): string[] {
   }
   if (!srcDir) return written;
 
+  const allow =
+    hostsMode === "all"
+      ? null
+      : hostsMode === "vscode"
+        ? new Set(["vscode-copilot.md"])
+        : new Set(["cursor.md"]); // auto + cursor
+
   const destDir = path.join(projectRoot, ".promptmcp", "hosts");
   fs.mkdirSync(destDir, { recursive: true });
   for (const file of fs.readdirSync(srcDir)) {
     if (!file.endsWith(".md")) continue;
+    if (allow && !allow.has(file)) continue;
     const dest = path.join(destDir, file);
     fs.copyFileSync(path.join(srcDir, file), dest);
     written.push(path.resolve(dest));

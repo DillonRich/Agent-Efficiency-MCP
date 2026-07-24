@@ -26,6 +26,7 @@ import {
   patchMcpServerEnv,
   removeEmptyMcpConfigFile,
   removeMcpConfig,
+  removeOrphanVscodeMcp,
   resolveHostsMode,
   resolveHostTargets,
   resolveLaunchMode,
@@ -81,8 +82,8 @@ Init / configure / uninstall options:
                       npx = resilient after moves (needs npm package)
   --env KEY=VALUE     Extra env for MCP server entry (repeatable)
   --hosts auto|cursor|vscode|all
-                      Which IDE MCP configs to touch (default: auto = Cursor;
-                      VS Code only if .vscode/ already exists)
+                      Which IDE MCP configs to touch (default: auto = Cursor only;
+                      use all if you want VS Code + other hosts too)
   --provider <name>   configure: deepseek|openai|anthropic|gemini|xai|local|auto
                       (case/spacing flexible: "Deep Seek", DeepSeek, DEEPSEEK)
   --api-key <key>     configure: sets the matching *_API_KEY for --provider
@@ -139,7 +140,7 @@ function parseArgs(argv: string[]): {
   let alsoGlobal = false;
   let purge = false;
   let hosts = resolveHostsMode();
-  let launch = resolveLaunchMode();
+  let launchExplicit: string | undefined;
   let provider: string | undefined;
   let apiKey: string | undefined;
   let model: string | undefined;
@@ -168,7 +169,7 @@ function parseArgs(argv: string[]): {
     } else if (a === "--keep-rules") {
       keepRules = true;
     } else if (a === "--launch" && args[i + 1]) {
-      launch = resolveLaunchMode(args[++i]);
+      launchExplicit = args[++i];
     } else if ((a === "--hosts" || a === "--host") && args[i + 1]) {
       hosts = resolveHostsMode(args[++i]);
     } else if (a === "--provider" && args[i + 1]) {
@@ -191,6 +192,8 @@ function parseArgs(argv: string[]): {
       if (eq > 0) env[kv.slice(0, eq)] = kv.slice(eq + 1);
     }
   }
+
+  const launch = resolveLaunchMode(launchExplicit, packageRoot);
 
   return {
     cmd,
@@ -270,6 +273,14 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
       console.log(`         ${result.path}`);
       touched.push(result.path);
     }
+    if (opts.hosts === "auto" || opts.hosts === "cursor") {
+      const orphans = removeOrphanVscodeMcp(projectRoot);
+      for (const p of orphans) {
+        console.log(`  [ok]   Removed leftover VS Code MCP clutter`);
+        console.log(`         ${p}`);
+        touched.push(p);
+      }
+    }
     const gi = ensureMcpSecretsGitignore(projectRoot);
     console.log(
       `  [${gi.status === "unchanged" ? "ok" : gi.status}] .gitignore (MCP configs may hold keys later)`,
@@ -298,7 +309,7 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
       );
     }
 
-    const hosts = installHostGuidance(projectRoot);
+    const hosts = installHostGuidance(projectRoot, opts.hosts);
     for (const p of hosts) {
       console.log(`  [ok]   Host guidance`);
       console.log(`         ${p}`);
@@ -339,7 +350,7 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
     `     npx agent-efficiency-mcp configure --project "${projectRoot}" --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"`,
   );
   console.log(
-    '     Optional: --effort high|max|none  --thinking on|off  --max-tokens 8192',
+    '     Optional: --effort none|low|medium|high|max  --thinking on|off  --max-tokens 8192',
   );
   console.log(
     '     Examples: --provider "Deep Seek" --model flash   or   --model "pro:max"',

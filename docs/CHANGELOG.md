@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-07-24 — 1.4.4 Cursor-only default + durable npx launch
+- `--hosts auto` is **Cursor only** (no `.vscode` dual-write); use `--hosts all` for multi-IDE
+- Removes leftover `.vscode/mcp.json` that only contained our server
+- Host tip markdown filtered to the selected IDE family
+- `npx … init` auto-selects `--launch npx` so MCP does not pin a disposable npm-cache path
+- Effort help text lists none|low|medium|high|max
+
 ## 2026-07-24 — 1.4.3 Configure UX + host scoping + real effort knobs
 - Init next-steps use generic `"<PROVIDER>"` / `"<YOUR_KEY>"` / `"<MODEL>"` (project path stays dynamic)
 - `--hosts auto|cursor|vscode|all` — default auto writes Cursor only (VS Code only if `.vscode/` exists)

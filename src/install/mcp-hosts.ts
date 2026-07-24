@@ -41,8 +41,10 @@ export function resolveHostsMode(raw?: string): HostsMode {
 }
 
 /**
- * auto: Cursor always; VS Code only if `.vscode/` already exists; other hosts if product dir exists.
- * cursor / vscode: that family only. all: every target (exotic still gated by onlyIfHostDirExists).
+ * auto / cursor: Cursor only (no `.vscode` litter).
+ * vscode: VS Code project only.
+ * all: every target (exotic still gated by onlyIfHostDirExists).
+ * Use `--hosts all` if you intentionally want multi-IDE project configs.
  */
 export function filterHostTargets(
   targets: HostTarget[],
@@ -50,43 +52,25 @@ export function filterHostTargets(
   mode: HostsMode,
   options?: { globalOnly?: boolean; alsoGlobal?: boolean; configure?: boolean },
 ): HostTarget[] {
+  void projectRoot;
   return targets.filter((t) => {
     if (options?.globalOnly) {
       return t.id === "cursor-global";
     }
     if (options?.configure) {
-      // Patch project configs for selected hosts; global only with --also-global
       if (t.id === "cursor-global") return Boolean(options.alsoGlobal);
-      if (mode === "cursor") return t.id === "cursor-project";
       if (mode === "vscode") return t.id === "vscode-project";
       if (mode === "all") {
         return t.id === "cursor-project" || t.id === "vscode-project";
       }
-      // auto configure: cursor project always; vscode only if file/dir already present
-      if (t.id === "cursor-project") return true;
-      if (t.id === "vscode-project") {
-        return (
-          fs.existsSync(t.configPath) ||
-          fs.existsSync(path.join(projectRoot, ".vscode"))
-        );
-      }
-      return false;
+      // auto + cursor configure: project Cursor only
+      return t.id === "cursor-project";
     }
 
-    if (mode === "cursor") return t.id.startsWith("cursor");
     if (mode === "vscode") return t.id === "vscode-project";
     if (mode === "all") return true;
-
-    // auto init
-    if (t.id.startsWith("cursor")) return true;
-    if (t.id === "vscode-project") {
-      return (
-        fs.existsSync(path.join(projectRoot, ".vscode")) ||
-        Boolean(process.env.VSCODE_PID) ||
-        process.env.TERM_PROGRAM === "vscode"
-      );
-    }
-    return true; // exotic: gated later by onlyIfHostDirExists
+    // auto + cursor init: Cursor global + project only
+    return t.id.startsWith("cursor");
   });
 }
 
@@ -152,13 +136,27 @@ export function resolveHostTargets(projectRoot: string): HostTarget[] {
   return targets;
 }
 
-export function resolveLaunchMode(explicit?: string): LaunchMode {
-  const raw = (
-    explicit ||
-    process.env.PROMPT_MCP_LAUNCH ||
-    "node"
-  ).toLowerCase();
-  return raw === "npx" ? "npx" : "node";
+export function resolveLaunchMode(
+  explicit?: string,
+  packageRootHint?: string,
+): LaunchMode {
+  if (explicit?.trim()) {
+    return explicit.trim().toLowerCase() === "npx" ? "npx" : "node";
+  }
+  const fromEnv = process.env.PROMPT_MCP_LAUNCH?.trim().toLowerCase();
+  if (fromEnv === "npx" || fromEnv === "node") return fromEnv;
+
+  // Consumer `npx agent-efficiency-mcp init` runs from npm cache / node_modules —
+  // pin launch to `npx` so MCP does not break when the cache folder is cleared.
+  const root = (packageRootHint || "").replace(/\\/g, "/").toLowerCase();
+  if (
+    root.includes("/_npx/") ||
+    root.includes("/node_modules/agent-efficiency-mcp") ||
+    root.includes("/node_modules/promptmcp")
+  ) {
+    return "npx";
+  }
+  return "node";
 }
 
 /**
@@ -345,6 +343,42 @@ export function patchMcpServerEnv(
     "utf8",
   );
   return { path: path.resolve(target.configPath), status: "updated" };
+}
+
+/**
+ * If Cursor-only install finds a leftover `.vscode/mcp.json` that only has our
+ * server (or is empty), remove it so prior dual-write installs do not leave clutter.
+ */
+export function removeOrphanVscodeMcp(projectRoot: string): string[] {
+  const removed: string[] = [];
+  const configPath = path.join(projectRoot, ".vscode", "mcp.json");
+  if (!fs.existsSync(configPath)) return removed;
+
+  try {
+    const data = readJsonObject(configPath);
+    const servers = data.servers ?? data.mcpServers;
+    const map =
+      servers && typeof servers === "object" && !Array.isArray(servers)
+        ? (servers as Record<string, unknown>)
+        : {};
+    const keys = Object.keys(map);
+    const onlyOurs =
+      keys.length === 0 ||
+      (keys.length === 1 && keys[0] === MCP_SERVER_KEY);
+    if (!onlyOurs) return removed;
+
+    fs.unlinkSync(configPath);
+    removed.push(path.resolve(configPath));
+    removeEmptyMcpConfigFile(configPath); // no-op if gone
+    const vscodeDir = path.join(projectRoot, ".vscode");
+    if (fs.existsSync(vscodeDir) && fs.readdirSync(vscodeDir).length === 0) {
+      fs.rmdirSync(vscodeDir);
+      removed.push(path.resolve(vscodeDir));
+    }
+  } catch {
+    /* ignore */
+  }
+  return removed;
 }
 
 /** Remove only our MCP server key; leave other servers intact. */
