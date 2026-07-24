@@ -219,14 +219,41 @@ describe("mcp launch", () => {
 
   it("maps configure flags to provider env vars", () => {
     const env = buildConfigureEnv({
-      provider: "deepseek",
+      provider: "Deep Seek",
       apiKey: "sk-abc",
-      model: "flash",
+      model: "flash high",
     });
     assert.equal(env.REWRITE_PROVIDER, "deepseek");
     assert.equal(env.DEEPSEEK_API_KEY, "sk-abc");
-    assert.equal(env.REWRITE_MODEL, "flash");
-    assert.equal(env.DEEPSEEK_MODEL, "flash");
+    assert.equal(env.REWRITE_MODEL, "deepseek-v4-flash");
+    assert.equal(env.DEEPSEEK_MODEL, "deepseek-v4-flash");
+    assert.equal(env.REWRITE_REASONING_EFFORT, "high");
+    assert.equal(env.REWRITE_THINKING, "enabled");
+  });
+});
+
+import { normalizeProviderName } from "../src/providers/index.js";
+import {
+  expandModelAlias,
+  parseModelSpec,
+} from "../src/providers/model.js";
+
+describe("provider + model aliases", () => {
+  it("normalizes messy provider names", () => {
+    assert.equal(normalizeProviderName("DeepSeek"), "deepseek");
+    assert.equal(normalizeProviderName("Deep Seek"), "deepseek");
+    assert.equal(normalizeProviderName("DEEPSEEK"), "deepseek");
+    assert.equal(normalizeProviderName("Open AI"), "openai");
+    assert.equal(normalizeProviderName("claude"), "anthropic");
+  });
+
+  it("expands model aliases and effort specs", () => {
+    assert.equal(expandModelAlias("flash"), "deepseek-v4-flash");
+    assert.equal(expandModelAlias("pro"), "deepseek-v4-pro");
+    assert.equal(expandModelAlias("GPT 5.6 Sol"), "gpt-5.6");
+    const spec = parseModelSpec("pro:max");
+    assert.equal(expandModelAlias(spec.modelRaw), "deepseek-v4-pro");
+    assert.equal(spec.effort, "max");
   });
 });
 

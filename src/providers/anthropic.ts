@@ -1,6 +1,7 @@
 import type { WorkspaceContext } from "../context.js";
 import { fetchWithRetry, readErrorBody, rewriteTimeoutMs } from "../http.js";
 import { resolveRewriteModel } from "./model.js";
+import { resolveRewriteRequestOptions } from "./rewrite-options.js";
 import {
   CENTRAL_COMPRESSION_PROMPT,
   buildUserPayload,
@@ -56,6 +57,7 @@ export class AnthropicProvider implements RewriteProvider {
       });
     }
 
+    const knobs = resolveRewriteRequestOptions();
     const response = await fetchWithRetry(
       url,
       {
@@ -67,8 +69,8 @@ export class AnthropicProvider implements RewriteProvider {
         },
         body: JSON.stringify({
           model,
-          max_tokens: 4096,
-          temperature: 0.1,
+          max_tokens: knobs.maxTokens ?? 4096,
+          temperature: knobs.temperature ?? 0.1,
           system: options?.systemPrompt ?? CENTRAL_COMPRESSION_PROMPT,
           messages: [{ role: "user", content }],
         }),

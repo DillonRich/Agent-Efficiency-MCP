@@ -31,6 +31,65 @@ function appData(...parts: string[]): string {
   return path.join(os.homedir(), ".config", ...parts);
 }
 
+/** Which IDE MCP configs init/configure should touch */
+export type HostsMode = "auto" | "cursor" | "vscode" | "all";
+
+export function resolveHostsMode(raw?: string): HostsMode {
+  const v = (raw || process.env.PROMPT_MCP_HOSTS || "auto").trim().toLowerCase();
+  if (v === "cursor" || v === "vscode" || v === "all" || v === "auto") return v;
+  return "auto";
+}
+
+/**
+ * auto: Cursor always; VS Code only if `.vscode/` already exists; other hosts if product dir exists.
+ * cursor / vscode: that family only. all: every target (exotic still gated by onlyIfHostDirExists).
+ */
+export function filterHostTargets(
+  targets: HostTarget[],
+  projectRoot: string,
+  mode: HostsMode,
+  options?: { globalOnly?: boolean; alsoGlobal?: boolean; configure?: boolean },
+): HostTarget[] {
+  return targets.filter((t) => {
+    if (options?.globalOnly) {
+      return t.id === "cursor-global";
+    }
+    if (options?.configure) {
+      // Patch project configs for selected hosts; global only with --also-global
+      if (t.id === "cursor-global") return Boolean(options.alsoGlobal);
+      if (mode === "cursor") return t.id === "cursor-project";
+      if (mode === "vscode") return t.id === "vscode-project";
+      if (mode === "all") {
+        return t.id === "cursor-project" || t.id === "vscode-project";
+      }
+      // auto configure: cursor project always; vscode only if file/dir already present
+      if (t.id === "cursor-project") return true;
+      if (t.id === "vscode-project") {
+        return (
+          fs.existsSync(t.configPath) ||
+          fs.existsSync(path.join(projectRoot, ".vscode"))
+        );
+      }
+      return false;
+    }
+
+    if (mode === "cursor") return t.id.startsWith("cursor");
+    if (mode === "vscode") return t.id === "vscode-project";
+    if (mode === "all") return true;
+
+    // auto init
+    if (t.id.startsWith("cursor")) return true;
+    if (t.id === "vscode-project") {
+      return (
+        fs.existsSync(path.join(projectRoot, ".vscode")) ||
+        Boolean(process.env.VSCODE_PID) ||
+        process.env.TERM_PROGRAM === "vscode"
+      );
+    }
+    return true; // exotic: gated later by onlyIfHostDirExists
+  });
+}
+
 /** Global + project host config targets for major MCP clients */
 export function resolveHostTargets(projectRoot: string): HostTarget[] {
   const targets: HostTarget[] = [

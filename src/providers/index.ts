@@ -30,11 +30,54 @@ const KNOWN: Exclude<ProviderName, "auto">[] = [
   "mock",
 ];
 
-/** Map common aliases → canonical provider id */
+/** Map common aliases → canonical provider id (case/spacing insensitive). */
 export function normalizeProviderName(raw: string): string {
-  const n = raw.trim().toLowerCase().replace(/-/g, "_");
-  if (n === "grok" || n === "x_ai") return "xai";
-  if (n === "google" || n === "google_ai" || n === "googleai") return "gemini";
+  const n = raw
+    .trim()
+    .toLowerCase()
+    .replace(/['"]/g, "")
+    .replace(/[\s-]+/g, "_")
+    .replace(/_+/g, "_");
+
+  // Collapsed forms: "Deep Seek" → deep_seek → deepseek
+  const compact = n.replace(/_/g, "");
+
+  if (
+    n === "grok" ||
+    n === "x_ai" ||
+    n === "xai" ||
+    compact === "xai" ||
+    compact === "grok"
+  ) {
+    return "xai";
+  }
+  if (
+    n === "google" ||
+    n === "google_ai" ||
+    n === "googleai" ||
+    n === "gemini" ||
+    compact === "google" ||
+    compact === "gemini"
+  ) {
+    return "gemini";
+  }
+  if (
+    compact === "deepseek" ||
+    n === "deep_seek" ||
+    n === "deepseek_ai" ||
+    compact === "deepseekai"
+  ) {
+    return "deepseek";
+  }
+  if (compact === "openai" || n === "open_ai") return "openai";
+  if (
+    compact === "anthropic" ||
+    n === "claude" ||
+    compact === "claude" ||
+    n === "anthropic_claude"
+  ) {
+    return "anthropic";
+  }
   if (
     n === "ollama" ||
     n === "lmstudio" ||
@@ -43,15 +86,24 @@ export function normalizeProviderName(raw: string): string {
     n === "llamacpp" ||
     n === "llama_cpp" ||
     n === "localai" ||
-    n === "private"
+    n === "private" ||
+    n === "local"
   ) {
     return "local";
   }
-  if (n === "openai_compatible" || n === "compat" || n === "openrouter") {
+  if (
+    n === "openai_compatible" ||
+    n === "openai_compat" ||
+    n === "compat" ||
+    n === "openrouter"
+  ) {
     return "openai_compat";
   }
-  if (n === "ci" || n === "offline" || n === "fixture") return "mock";
-  return n;
+  if (n === "ci" || n === "offline" || n === "fixture" || n === "mock") {
+    return "mock";
+  }
+  if (n === "auto") return "auto";
+  return compact || n;
 }
 
 function detectProvider(): Exclude<ProviderName, "auto"> {

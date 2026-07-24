@@ -19,13 +19,17 @@ import { BLUEPRINT_FILENAME } from "./constants.js";
 import { starterBlueprintStub, writeAgentIntent } from "./context.js";
 import { formatDoctorReport, runDoctor } from "./doctor.js";
 import { buildConfigureEnv } from "./configure-env.js";
+import { ensureMcpSecretsGitignore } from "./install/gitignore.js";
 import {
+  filterHostTargets,
   mergeMcpConfig,
   patchMcpServerEnv,
   removeEmptyMcpConfigFile,
   removeMcpConfig,
+  resolveHostsMode,
   resolveHostTargets,
   resolveLaunchMode,
+  type HostsMode,
   type LaunchMode,
 } from "./install/mcp-hosts.js";
 import {
@@ -76,17 +80,27 @@ Init / configure / uninstall options:
   --launch node|npx   How hosts start the server (default: node)
                       npx = resilient after moves (needs npm package)
   --env KEY=VALUE     Extra env for MCP server entry (repeatable)
+  --hosts auto|cursor|vscode|all
+                      Which IDE MCP configs to touch (default: auto = Cursor;
+                      VS Code only if .vscode/ already exists)
   --provider <name>   configure: deepseek|openai|anthropic|gemini|xai|local|auto
+                      (case/spacing flexible: "Deep Seek", DeepSeek, DEEPSEEK)
   --api-key <key>     configure: sets the matching *_API_KEY for --provider
-  --model <id>        configure: sets REWRITE_MODEL (and provider model when known)
+  --model <id>        configure: rewrite-model alias or exact API id
+                      (e.g. flash, pro, "sonnet 4", gpt-4.1-mini; optional "flash high")
+  --effort <level>    configure: none|low|medium|high|max (thinking / reasoning_effort)
+  --thinking on|off   configure: force thinking enabled/disabled (DeepSeek V4+)
+  --max-tokens <n>    configure: REWRITE_MAX_TOKENS for the rewrite API call
+  --temperature <n>   configure: REWRITE_TEMPERATURE (default 0.1)
   --also-global       configure: also write keys into ~/.cursor/mcp.json (default: project only)
   --purge             uninstall: delete blueprint .md(s), entire .promptmcp/, empty mcp husks
 
 Keys are stored in the MCP server env block (mcp.json) — we never create or edit your app's .env.
+configure also adds .cursor/mcp.json to .gitignore so keys are less likely to be committed.
 
 Typical consumer flow:
   npx agent-efficiency-mcp@latest init --project .
-  npx agent-efficiency-mcp@latest configure --project . --provider deepseek --api-key YOUR_KEY --model flash
+  npx agent-efficiency-mcp@latest configure --project . --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"
   (reload MCP) then send a task → review ${BLUEPRINT_FILENAME} → type GO
 
 If the host model skips the gate: type /optimize or "run the efficiency engine".
@@ -106,8 +120,13 @@ function parseArgs(argv: string[]): {
   provider?: string;
   apiKey?: string;
   model?: string;
+  effort?: string;
+  thinking?: string;
+  maxTokens?: string;
+  temperature?: string;
   alsoGlobal: boolean;
   purge: boolean;
+  hosts: HostsMode;
 } {
   const args = argv.slice(2);
   const cmd = (args[0] || "help").toLowerCase();
@@ -119,10 +138,15 @@ function parseArgs(argv: string[]): {
   let keepRules = false;
   let alsoGlobal = false;
   let purge = false;
+  let hosts = resolveHostsMode();
   let launch = resolveLaunchMode();
   let provider: string | undefined;
   let apiKey: string | undefined;
   let model: string | undefined;
+  let effort: string | undefined;
+  let thinking: string | undefined;
+  let maxTokens: string | undefined;
+  let temperature: string | undefined;
   const env: Record<string, string> = {};
 
   for (let i = 1; i < args.length; i++) {
@@ -145,12 +169,22 @@ function parseArgs(argv: string[]): {
       keepRules = true;
     } else if (a === "--launch" && args[i + 1]) {
       launch = resolveLaunchMode(args[++i]);
+    } else if ((a === "--hosts" || a === "--host") && args[i + 1]) {
+      hosts = resolveHostsMode(args[++i]);
     } else if (a === "--provider" && args[i + 1]) {
       provider = args[++i];
     } else if ((a === "--api-key" || a === "--apikey") && args[i + 1]) {
       apiKey = args[++i];
     } else if (a === "--model" && args[i + 1]) {
       model = args[++i];
+    } else if ((a === "--effort" || a === "--reasoning-effort") && args[i + 1]) {
+      effort = args[++i];
+    } else if (a === "--thinking" && args[i + 1]) {
+      thinking = args[++i];
+    } else if ((a === "--max-tokens" || a === "--max_tokens") && args[i + 1]) {
+      maxTokens = args[++i];
+    } else if (a === "--temperature" && args[i + 1]) {
+      temperature = args[++i];
     } else if (a === "--env" && args[i + 1]) {
       const kv = args[++i];
       const eq = kv.indexOf("=");
@@ -171,8 +205,13 @@ function parseArgs(argv: string[]): {
     provider,
     apiKey,
     model,
+    effort,
+    thinking,
+    maxTokens,
+    temperature,
     alsoGlobal,
     purge,
+    hosts,
   };
 }
 
@@ -202,13 +241,15 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
   const touched: string[] = [];
 
   if (!opts.skipHosts) {
-    console.log("Registering MCP server (merge, keep existing servers)…");
-    const targets = resolveHostTargets(projectRoot).filter((t) => {
-      if (opts.globalOnly) {
-        return !t.id.includes("project") && t.id !== "vscode-project";
-      }
-      return true;
-    });
+    console.log(
+      `Registering MCP server (hosts=${opts.hosts}; merge, keep existing servers)…`,
+    );
+    const targets = filterHostTargets(
+      resolveHostTargets(projectRoot),
+      projectRoot,
+      opts.hosts,
+      { globalOnly: opts.globalOnly },
+    );
 
     for (const t of targets) {
       const onlyIf =
@@ -229,6 +270,12 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
       console.log(`         ${result.path}`);
       touched.push(result.path);
     }
+    const gi = ensureMcpSecretsGitignore(projectRoot);
+    console.log(
+      `  [${gi.status === "unchanged" ? "ok" : gi.status}] .gitignore (MCP configs may hold keys later)`,
+    );
+    console.log(`         ${gi.path}`);
+    touched.push(gi.path);
     console.log("");
   }
 
@@ -285,11 +332,19 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
   }
 
   console.log("Done. Next steps:");
-  console.log("  1. Set your BYOK key (writes into MCP env — no project .env required):");
   console.log(
-    `     npx agent-efficiency-mcp configure --project "${projectRoot}" --provider deepseek --api-key YOUR_KEY --model flash`,
+    "  1. Set your BYOK rewrite key (MCP env only — no app .env; path is your project):",
   );
-  console.log("  2. Restart Cursor / VS Code / Windsurf / Claude (or reload MCP)");
+  console.log(
+    `     npx agent-efficiency-mcp configure --project "${projectRoot}" --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"`,
+  );
+  console.log(
+    '     Optional: --effort high|max|none  --thinking on|off  --max-tokens 8192',
+  );
+  console.log(
+    '     Examples: --provider "Deep Seek" --model flash   or   --model "pro:max"',
+  );
+  console.log("  2. Restart / reload MCP in your IDE");
   console.log("  3. Confirm server `agent-efficiency-engine` is connected");
   console.log(
     `  4. Send a task prompt → review ${BLUEPRINT_FILENAME} → type GO`,
@@ -297,7 +352,9 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
   console.log(
     '  5. If the model skips the gate: /optimize or "run the efficiency engine"',
   );
-  console.log(`  6. Health check: agent-efficiency-mcp doctor --project "${projectRoot}"`);
+  console.log(
+    `  6. Health check: agent-efficiency-mcp doctor --project "${projectRoot}"`,
+  );
   console.log("");
   if (touched.length) {
     console.log("Paths touched:");
@@ -312,32 +369,32 @@ async function runConfigure(opts: ReturnType<typeof parseArgs>): Promise<void> {
     provider: opts.provider,
     apiKey: opts.apiKey,
     model: opts.model,
+    effort: opts.effort,
+    thinking: opts.thinking,
+    maxTokens: opts.maxTokens,
+    temperature: opts.temperature,
     env: opts.env,
   });
 
   if (Object.keys(env).length === 0) {
     console.error(
       "Nothing to set. Example:\n" +
-        `  npx agent-efficiency-mcp configure --project "${projectRoot}" --provider deepseek --api-key YOUR_KEY --model flash\n` +
+        `  npx agent-efficiency-mcp configure --project "${projectRoot}" --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"\n` +
         "Or pass raw vars: --env DEEPSEEK_API_KEY=... --env REWRITE_PROVIDER=deepseek",
     );
     process.exit(1);
   }
 
-  // Default: project MCP configs only (avoid putting secrets in ~/.cursor for every repo).
-  const targets = resolveHostTargets(projectRoot).filter((t) => {
-    if (opts.globalOnly) {
-      return t.id === "cursor-global";
-    }
-    if (opts.alsoGlobal) {
-      return (
-        t.id === "cursor-project" ||
-        t.id === "vscode-project" ||
-        t.id === "cursor-global"
-      );
-    }
-    return t.id === "cursor-project" || t.id === "vscode-project";
-  });
+  const targets = filterHostTargets(
+    resolveHostTargets(projectRoot),
+    projectRoot,
+    opts.hosts,
+    {
+      globalOnly: opts.globalOnly,
+      alsoGlobal: opts.alsoGlobal,
+      configure: true,
+    },
+  );
 
   const redacted = Object.fromEntries(
     Object.entries(env).map(([k, v]) =>
@@ -373,6 +430,15 @@ async function runConfigure(opts: ReturnType<typeof parseArgs>): Promise<void> {
     );
     process.exit(1);
   }
+
+  const gi = ensureMcpSecretsGitignore(projectRoot);
+  console.log(
+    `\n  [${gi.status === "unchanged" ? "ok" : gi.status}] .gitignore — keep MCP env keys out of git`,
+  );
+  console.log(`         ${gi.path}`);
+  console.log(
+    "  Note: keys live in mcp.json env (required for MCP). Do not commit that file.",
+  );
 
   console.log("");
   console.log("Done. Reload MCP / restart the IDE, then run:");

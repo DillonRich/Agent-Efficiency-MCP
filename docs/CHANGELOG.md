@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-07-24 — 1.4.3 Configure UX + host scoping + real effort knobs
+- Init next-steps use generic `"<PROVIDER>"` / `"<YOUR_KEY>"` / `"<MODEL>"` (project path stays dynamic)
+- `--hosts auto|cursor|vscode|all` — default auto writes Cursor only (VS Code only if `.vscode/` exists)
+- Flexible provider/model aliases (`Deep Seek`, `flash high`, `pro:max`, GPT nicknames)
+- `--effort` / `--thinking` / `--max-tokens` / `--temperature` → MCP env → actual rewrite API body
+- Auto-append `.cursor/mcp.json` (and `.vscode/mcp.json`) to project `.gitignore` on init/configure
+
 ## 2026-07-24 — 1.4.2 Env security + clean uninstall
 - Confirmed: consumers never get a project `.env` from us; keys live only in the MCP server `env` block (`mcp.json`)
 - `configure` defaults to **project** MCP configs; `--also-global` opt-in for `~/.cursor/mcp.json`

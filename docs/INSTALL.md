@@ -70,11 +70,15 @@ Type `/optimize` or say **run the efficiency engine**, then confirm MCP is conne
 Keys go in the **MCP server `env` block** inside IDE config (`mcp.json`) — scoped to the PromptMCP server entry only:
 
 ```bash
-npx agent-efficiency-mcp configure --project . --provider deepseek --api-key YOUR_KEY --model flash
+npx agent-efficiency-mcp configure --project . --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"
+# optional: --effort high|max|none --thinking on|off --max-tokens 8192
 ```
 
-- Default: project MCP configs only (`.cursor/mcp.json`, `.vscode/mcp.json`)
-- Optional: `--also-global` to also write `~/.cursor/mcp.json` (avoid unless you want the key for every workspace)
+- Default hosts (`--hosts auto`): **Cursor** project MCP only; VS Code only if `.vscode/` already exists (use `--hosts vscode` or `all` to force)
+- Keys go in `.cursor/mcp.json` server `env` (required for MCP). `configure` / `init` add that path to `.gitignore`
+- Optional: `--also-global` for `~/.cursor/mcp.json` (avoid unless you want the key for every workspace)
+- Provider/model names are flexible (`Deep Seek`, `flash`, `pro:max`, exact API ids)
+- `--model` / `--effort` / `--max-tokens` are sent on the rewrite API call (they affect which model and thinking mode run)
 - Also accepted at init: `--env DEEPSEEK_API_KEY=...`
 - Or edit Cursor Settings → MCP → server env UI
 

@@ -2,6 +2,7 @@ import type { WorkspaceContext } from "../context.js";
 import { fetchWithRetry, readErrorBody, rewriteTimeoutMs } from "../http.js";
 import type { VisionImage } from "../vision.js";
 import { visionDataUrl } from "../vision.js";
+import { resolveRewriteRequestOptions } from "./rewrite-options.js";
 
 export interface OptimizeResult {
   blueprint: string;
@@ -152,6 +153,9 @@ export async function postChatCompletions(options: {
   user: string;
   images?: VisionImage[];
   temperature?: number;
+  maxTokens?: number;
+  thinking?: { type: "enabled" | "disabled" };
+  reasoningEffort?: string;
   label?: string;
 }): Promise<{ content: string; model: string }> {
   const label = options.label || "Rewrite API";
@@ -166,6 +170,33 @@ export async function postChatCompletions(options: {
     ];
   }
 
+  const knobs = resolveRewriteRequestOptions();
+  const temperature = options.temperature ?? knobs.temperature ?? 0.1;
+  const maxTokens = options.maxTokens ?? knobs.maxTokens;
+  const thinking = options.thinking ?? knobs.thinking;
+  let reasoningEffort = options.reasoningEffort ?? knobs.reasoningEffort;
+  // DeepSeek V4 documents high|max; map medium→high, drop low when thinking off
+  if (reasoningEffort === "medium") reasoningEffort = "high";
+  if (reasoningEffort === "low" && thinking?.type !== "disabled") {
+    reasoningEffort = "high";
+  }
+  if (thinking?.type === "disabled") reasoningEffort = undefined;
+
+  const body: Record<string, unknown> = {
+    model: options.model,
+    messages: [
+      { role: "system", content: options.system },
+      { role: "user", content: userContent },
+    ],
+    temperature,
+    stream: false,
+  };
+  if (maxTokens) body.max_tokens = maxTokens;
+  if (thinking) body.thinking = thinking;
+  if (reasoningEffort && reasoningEffort !== "none") {
+    body.reasoning_effort = reasoningEffort;
+  }
+
   const response = await fetchWithRetry(
     options.url,
     {
@@ -174,15 +205,7 @@ export async function postChatCompletions(options: {
         Authorization: `Bearer ${options.apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: options.model,
-        messages: [
-          { role: "system", content: options.system },
-          { role: "user", content: userContent },
-        ],
-        temperature: options.temperature ?? 0.1,
-        stream: false,
-      }),
+      body: JSON.stringify(body),
     },
     rewriteTimeoutMs(),
   );
