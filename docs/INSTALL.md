@@ -71,11 +71,12 @@ Keys go in the **MCP server `env` block** inside IDE config (`mcp.json`) — sco
 
 ```bash
 npx agent-efficiency-mcp configure --project . --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"
-# optional: --effort high|max|none --thinking on|off --max-tokens 8192
+# optional: --effort none|low|medium|high|max --thinking on|off --max-tokens 8192
 ```
 
-- Default hosts (`--hosts auto`): **Cursor** project MCP only; VS Code only if `.vscode/` already exists (use `--hosts vscode` or `all` to force)
+- Default hosts (`--hosts auto`): **Cursor only**. Use `--hosts all` if you also want VS Code / other IDE project configs
 - Keys go in `.cursor/mcp.json` server `env` (required for MCP). `configure` / `init` add that path to `.gitignore`
+- Consumer `npx … init` defaults to `--launch npx` so MCP does not pin a disposable npm-cache path
 - Optional: `--also-global` for `~/.cursor/mcp.json` (avoid unless you want the key for every workspace)
 - Provider/model names are flexible (`Deep Seek`, `flash`, `pro:max`, exact API ids)
 - `--model` / `--effort` / `--max-tokens` are sent on the rewrite API call (they affect which model and thinking mode run)
