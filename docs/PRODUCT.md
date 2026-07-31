@@ -8,7 +8,7 @@ Open-source local MCP server that rewrites messy IDE prompts into dense engineer
 
 ## Distribution model
 **AGPL-3.0-only open source · local-only · bring your own API key (BYOK).**  
-No paid cloud subscription for the tool itself. Closed-source / proprietary use requires a commercial license ([COMMERCIAL.md](./COMMERCIAL.md)). Users install the MCP, put their own provider key in `.env` / MCP env, and run entirely on their machine.
+No paid cloud subscription for the tool itself. Closed-source / proprietary use requires a commercial license ([COMMERCIAL.md](./COMMERCIAL.md)). Users install the MCP, put their own provider key in the MCP server `env` (via `configure`), and run entirely on their machine.
 
 ## Problem
 - Vague prompts → multi-turn agent thrash and wasted tokens (on top of Cursor/Claude/Copilot bills).
