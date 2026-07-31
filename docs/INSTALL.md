@@ -75,15 +75,20 @@ npx agent-efficiency-mcp configure --project . --provider "<PROVIDER>" --api-key
 ```
 
 - Default hosts (`--hosts auto`): **Cursor only**. Use `--hosts all` if you also want VS Code / other IDE project configs
-- Keys go in `.cursor/mcp.json` server `env` (required for MCP). `configure` / `init` add that path to `.gitignore`
+- Keys / model live in the MCP server `env` block. After `init`, Cursor usually has **two** copies:
+  1. Project: `<your-app>/.cursor/mcp.json`
+  2. Global: `~/.cursor/mcp.json` (Windows: `C:\Users\<you>\.cursor\mcp.json`)
+- **Best practice to change provider / model / key:** re-run `configure` (it syncs both when our server is registered). Hand-editing only one file can leave the other stale and the MCP process may use the empty one.
+- If you edit JSON by hand, update **both** files’ `agent-efficiency-engine.env` (or disable the global entry), then reload MCP.
+- `configure` / `init` add project mcp.json paths to `.gitignore`
 - Consumer `npx … init` defaults to `--launch npx` so MCP does not pin a disposable npm-cache path
-- Optional: `--also-global` for `~/.cursor/mcp.json` (avoid unless you want the key for every workspace)
 - Provider/model names are flexible (`Deep Seek`, `flash`, `pro:max`, exact API ids)
 - `--model` / `--effort` / `--max-tokens` are sent on the rewrite API call (they affect which model and thinking mode run)
 - Also accepted at init: `--env DEEPSEEK_API_KEY=...`
 - Or edit Cursor Settings → MCP → server env UI
+- Optional: [Code Graph](https://www.npmjs.com/package/@sdsrs/code-graph) (or similar) as a **separate** MCP can improve repo mapping; it is **not** required — Agent Efficiency gathers its own context
 
-Local **package clone** contributors may use the package’s own `.env` (see `.env.example`) — that is the Agent Efficiency repo, not the consumer app.
+Local **package clone** contributors may use the package’s own `.env` (see `.env.example`) — that is the Agent Efficiency repo, not the consumer app. Legacy `.agent_intent.md` files (old product name) are unused; safe to delete.
 
 ### Uninstall
 

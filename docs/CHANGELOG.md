@@ -6,6 +6,8 @@ Newest first.
 - `configure` patches `~/.cursor/mcp.json` when our server is already registered there (fixes dual-entry empty-env failures)
 - Clearer “no provider” error: MCP env / configure, not package `.env` for npx consumers
 - Doctor FAIL without process env marked as expected for npx path
+- Docs: dual mcp.json edit warning + prefer `configure`; optional Code Graph note; legacy `.agent_intent.md` unused
+- PROMPTMCP_META: `prompt_tokens` / `completion_tokens` / `est_usd` when the provider returns usage; directive flags include file/scope/search
 
 ## 2026-07-24 — 1.4.5 Init copy polish
 - Next-steps note smart provider/model name mapping

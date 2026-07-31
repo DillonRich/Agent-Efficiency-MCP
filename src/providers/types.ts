@@ -3,6 +3,9 @@ import { fetchWithRetry, readErrorBody, rewriteTimeoutMs } from "../http.js";
 import type { VisionImage } from "../vision.js";
 import { visionDataUrl } from "../vision.js";
 import { resolveRewriteRequestOptions } from "./rewrite-options.js";
+import { parseOpenAiUsage, type TokenUsage } from "./usage.js";
+
+export type { TokenUsage } from "./usage.js";
 
 export interface OptimizeResult {
   blueprint: string;
@@ -25,6 +28,12 @@ export interface GenerateOptions {
   images?: VisionImage[];
 }
 
+export type GenerateResult = {
+  content: string;
+  model: string;
+  usage?: TokenUsage;
+};
+
 export interface RewriteProvider {
   readonly name: string;
   /** Providers that cannot consume images should ignore options.images */
@@ -33,7 +42,7 @@ export interface RewriteProvider {
     rawPrompt: string,
     context: WorkspaceContext,
     options?: GenerateOptions,
-  ): Promise<{ content: string; model: string }>;
+  ): Promise<GenerateResult>;
 }
 
 /**
@@ -135,6 +144,13 @@ export interface ChatCompletionsResponse {
       content?: string | null;
     };
   }>;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+    input_tokens?: number;
+    output_tokens?: number;
+  };
   error?: { message?: string };
 }
 
@@ -157,7 +173,7 @@ export async function postChatCompletions(options: {
   thinking?: { type: "enabled" | "disabled" };
   reasoningEffort?: string;
   label?: string;
-}): Promise<{ content: string; model: string }> {
+}): Promise<GenerateResult> {
   const label = options.label || "Rewrite API";
   let userContent: OpenAiContent = options.user;
   if (options.images && options.images.length > 0) {
@@ -231,5 +247,9 @@ export async function postChatCompletions(options: {
     throw new Error(`${label} returned no message content.`);
   }
 
-  return { content, model: options.model };
+  return {
+    content,
+    model: options.model,
+    usage: parseOpenAiUsage(data.usage),
+  };
 }

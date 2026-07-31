@@ -19,6 +19,12 @@ import {
   buildSystemPrompt,
 } from "./providers/prompt-variants.js";
 import {
+  addUsage,
+  emptyUsage,
+  estimateRewriteUsd,
+  type TokenUsage,
+} from "./providers/usage.js";
+import {
   appendBlueprintDelta,
   readPreviousBlueprint,
 } from "./blueprint-diff.js";
@@ -48,8 +54,9 @@ export function buildMetricsHeader(options: {
   visionImages?: number;
   archetype?: string;
   archetypeTags?: string[];
+  usage?: TokenUsage;
 }): string {
-  const activeFlags = (
+  const activeFlags: string[] = (
     [
       "include",
       "long",
@@ -60,6 +67,18 @@ export function buildMetricsHeader(options: {
       "strict",
     ] as const
   ).filter((k) => options.directives[k]);
+  if (options.directives.files.length) {
+    activeFlags.push(`file×${options.directives.files.length}`);
+  }
+  if (options.directives.media.length) {
+    activeFlags.push(`media×${options.directives.media.length}`);
+  }
+  if (options.directives.scopes.length) {
+    activeFlags.push(`scope×${options.directives.scopes.length}`);
+  }
+  if (options.directives.searches.length) {
+    activeFlags.push(`search×${options.directives.searches.length}`);
+  }
 
   const lines = [
     "<!-- PROMPTMCP_META",
@@ -84,8 +103,20 @@ export function buildMetricsHeader(options: {
     `research_urls: ${options.directives.searches.length}`,
     `directives: ${activeFlags.length ? activeFlags.join(",") : "(none)"}`,
     `repair_pass: ${options.repaired ? "yes" : "no"}`,
-    "-->",
   ];
+
+  if (options.usage && options.usage.totalTokens > 0) {
+    lines.push(`prompt_tokens: ${options.usage.promptTokens}`);
+    lines.push(`completion_tokens: ${options.usage.completionTokens}`);
+    lines.push(`total_tokens: ${options.usage.totalTokens}`);
+    const est = estimateRewriteUsd(options.model, options.usage);
+    if (est) {
+      lines.push(`est_usd: ${est}`);
+      lines.push(`est_usd_note: approximate list rates; not a bill`);
+    }
+  }
+
+  lines.push("-->");
   return lines.join("\n");
 }
 
@@ -190,10 +221,16 @@ export async function generateOptimizedBlueprint(
       "(User provided only directives; infer intent from forced files/media/search if present.)") +
     (enrichBlock ? `\n\n${enrichBlock}` : "");
 
-  let { content, model } = await provider.generate(promptBody, context, {
-    systemPrompt,
-    images,
-  });
+  let usage = emptyUsage();
+  let { content, model, usage: u0 } = await provider.generate(
+    promptBody,
+    context,
+    {
+      systemPrompt,
+      images,
+    },
+  );
+  usage = addUsage(usage, u0);
 
   let validated = validateAndSanitizeBlueprint(content, context.knownPaths, {
     forcedPaths: [...directives.files, ...directives.media],
@@ -216,6 +253,7 @@ export async function generateOptimizedBlueprint(
     );
     content = repair.content;
     model = repair.model;
+    usage = addUsage(usage, repair.usage);
     repaired = true;
     validated = validateAndSanitizeBlueprint(content, context.knownPaths, {
       forcedPaths: [...directives.files, ...directives.media],
@@ -267,6 +305,7 @@ export async function generateOptimizedBlueprint(
     );
     content = repair.content;
     model = repair.model;
+    usage = addUsage(usage, repair.usage);
     repaired = true;
     validated = validateAndSanitizeBlueprint(content, context.knownPaths, {
       forcedPaths: [...directives.files, ...directives.media],
@@ -330,6 +369,7 @@ export async function generateOptimizedBlueprint(
     visionImages: images.length,
     archetype: archetype.primary,
     archetypeTags: archetype.tags,
+    usage: usage.totalTokens > 0 ? usage : undefined,
   });
   blueprint = `${header}\n${blueprint.replace(/^\s+/, "")}`;
 

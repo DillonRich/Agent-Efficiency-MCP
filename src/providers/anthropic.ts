@@ -9,6 +9,10 @@ import {
 } from "./types.js";
 interface AnthropicResponse {
   content?: Array<{ type?: string; text?: string }>;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+  };
   error?: { message?: string };
 }
 
@@ -103,6 +107,17 @@ export class AnthropicProvider implements RewriteProvider {
       throw new Error("Anthropic API returned no text content.");
     }
 
-    return { content: out, model };
+    const inTok = Number(data.usage?.input_tokens || 0);
+    const outTok = Number(data.usage?.output_tokens || 0);
+    const usage =
+      inTok > 0 || outTok > 0
+        ? {
+            promptTokens: inTok,
+            completionTokens: outTok,
+            totalTokens: inTok + outTok,
+          }
+        : undefined;
+
+    return { content: out, model, usage };
   }
 }
