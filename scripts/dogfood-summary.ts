@@ -1,5 +1,5 @@
 /**
- * Summarize personal gate dogfood CSV (see docs/DOGFOOD_GATE.md).
+ * Summarize personal gate dogfood CSV (fixtures/dogfood/gate-log.csv).
  *
  * Usage:
  *   npm run dogfood-summary
@@ -31,7 +31,7 @@ function main(): void {
   if (!existsSync(file)) {
     console.error(`No dogfood log at ${file}`);
     console.error(`Copy template: ${template}`);
-    console.error("See docs/DOGFOOD_GATE.md");
+    console.error("Copy fixtures/dogfood/gate-log.template.csv → gate-log.csv");
     process.exit(2);
   }
 

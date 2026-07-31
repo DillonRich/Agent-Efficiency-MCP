@@ -26,7 +26,6 @@
     "measure-context": "tsx scripts/measure-context-budget.ts",
     "dogfood-summary": "tsx scripts/dogfood-summary.ts",
     "auto-dogfood": "tsx scripts/auto-dogfood.ts",
-    "demo-gif": "node scripts/make-demo-gif.mjs",
     "doctor": "tsx src/cli.ts doctor",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run typecheck && npm test && npm run smoke:offline && npm run eval:mock && npm run flake-check && npm run auto-dogfood"

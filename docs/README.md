@@ -1,6 +1,6 @@
 # Documentation
 
-Start with **[INSTALL.md](./INSTALL.md)** or the root **[README.md](../README.md)**.
+Start with the root **[README.md](../README.md)** or **[INSTALL.md](./INSTALL.md)**.
 
 ## Users
 
@@ -14,26 +14,7 @@ Start with **[INSTALL.md](./INSTALL.md)** or the root **[README.md](../README.md
 | [SECURITY.md](./SECURITY.md) | Trust boundary and reporting |
 | [COMMERCIAL.md](./COMMERCIAL.md) | AGPL and proprietary license |
 | [CHANGELOG.md](./CHANGELOG.md) | Release notes |
-
-## Product and design
-
-| Doc | Purpose |
-|-----|---------|
-| [PRODUCT.md](./PRODUCT.md) | Scope and audience |
 | [WORKFLOW.md](./WORKFLOW.md) | Pause / GO / ignore contract |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Components and data flow |
-| [ENGINE.md](./ENGINE.md) | Rewrite rules and providers |
-| [DECISIONS.md](./DECISIONS.md) | Locked product decisions |
-| [ROADMAP.md](./ROADMAP.md) | Done and optional next |
-| [STATUS.md](./STATUS.md) | Current ship status |
-
-## Quality and maintainers
-
-| Doc | Purpose |
-|-----|---------|
-| [QUALITY.md](./QUALITY.md) | Cross-model quality layers |
+| [ENGINE.md](./ENGINE.md) | Providers and rewrite knobs |
+| [QUALITY.md](./QUALITY.md) | Quality layers |
 | [EVAL.md](./EVAL.md) | R1–R10 rubric and `npm run eval` |
-| [SCORECARD.md](./SCORECARD.md) | Latest numbers |
-| [DOGFOOD_GATE.md](./DOGFOOD_GATE.md) | Soft-gate logging |
-| [TEST_PLAN.md](./TEST_PLAN.md) | Smoke and live Cursor cases |
-| [STRUCTURE.md](./STRUCTURE.md) | Repo layout |

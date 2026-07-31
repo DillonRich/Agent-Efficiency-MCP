@@ -2,7 +2,7 @@
  * One iteration of the continuous quality improvement loop.
  * - unit tests + offline smoke
  * - optional live eval if key present and --eval
- * - writes docs/SCORECARD.md snapshot
+ * - writes fixtures/eval/results/SCORECARD.md snapshot (gitignored)
  *
  * Never pushes to git remotes.
  */
@@ -184,8 +184,10 @@ ${
 
 See [EVAL.md](./EVAL.md) and [QUALITY.md](./QUALITY.md).
 `;
-  writeFileSync(join(root, "docs/SCORECARD.md"), scorecard, "utf8");
-  console.error(`Wrote docs/SCORECARD.md and ${loopPath}`);
+  const scorecardPath = join(root, "fixtures/eval/results/SCORECARD.md");
+  mkdirSync(dirname(scorecardPath), { recursive: true });
+  writeFileSync(scorecardPath, scorecard, "utf8");
+  console.error(`Wrote ${scorecardPath} and ${loopPath}`);
   process.exit(exit);
 }
 

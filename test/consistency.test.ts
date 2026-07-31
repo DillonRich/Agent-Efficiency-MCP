@@ -50,6 +50,6 @@ describe("product consistency", () => {
       assert.ok(pkg.scripts[s], `missing script ${s}`);
     }
     assert.match(read(".github/workflows/ci.yml"), /auto-dogfood/);
-    assert.ok(existsSync(join(root, "docs/assets/demo.gif")));
+    assert.ok(existsSync(join(root, "docs/assets/demo.png")));
   });
 });

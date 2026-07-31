@@ -87,7 +87,7 @@ Tradeoff: more tokens for the coding agent after `GO`, higher fidelity.
 Syntax (brackets preferred; quotes also work):
 
 ```text
-@promptmcp:file[src/server.ts, docs/PRODUCT.md]
+@promptmcp:file[src/server.ts, docs/ENGINE.md]
 @mcp:file"src/a.ts, src/b.ts"
 ```
 
@@ -236,7 +236,7 @@ Flags and args together:
 
 ```text
 @promptmcp:include @promptmcp:long @promptmcp:test @promptmcp:strict
-@promptmcp:file[src/server.ts, docs/PRODUCT.md]
+@promptmcp:file[src/server.ts, docs/ENGINE.md]
 @promptmcp:media[mockups/hero.png]
 @promptmcp:search[https://stripe.com/docs/checkout] focus on embedded Checkout UX and dark theme patterns
 Please wire a checkout flow that matches our brand.

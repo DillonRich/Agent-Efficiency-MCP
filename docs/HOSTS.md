@@ -26,4 +26,4 @@ Cursor is the main target. Quick VS Code check:
 4. In Agent mode, send a messy task. Expect `optimize_and_blueprint_intent`, then freeze, then `GO`.
 5. If skipped: `run the efficiency engine` or `@promptmcp:include`.
 
-See [INSTALL.md](./INSTALL.md), [QUALITY.md](./QUALITY.md), [DOGFOOD_GATE.md](./DOGFOOD_GATE.md).
+See [INSTALL.md](./INSTALL.md) and [QUALITY.md](./QUALITY.md).

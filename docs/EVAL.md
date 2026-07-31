@@ -23,4 +23,4 @@
 Messy, planning, follow-up, concrete, vague, ignore, directives, overconstrained, contradictory, long ramble, multi-goal, underspecified bug, tour-risk.
 
 ## Latest measured (DeepSeek flash)
-Mean composite **99**, gates_passed **true**. See [SCORECARD.md](./SCORECARD.md).
+Mean composite **99**, gates_passed **true**. Refresh with `npm run quality-loop`.

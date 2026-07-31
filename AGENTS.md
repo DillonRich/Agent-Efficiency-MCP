@@ -3,9 +3,9 @@
 PromptMCP. AGPL-3.0-only local BYOK MCP. Rewrite to `Agent_Efficiency_MCP.md`, freeze until `GO`.
 
 ## Read
-1. [docs/STATUS.md](docs/STATUS.md)
-2. [docs/PRODUCT.md](docs/PRODUCT.md)
-3. [docs/ENGINE.md](docs/ENGINE.md)
+1. [README.md](README.md)
+2. [docs/ENGINE.md](docs/ENGINE.md)
+3. [docs/WORKFLOW.md](docs/WORKFLOW.md)
 
 ## Code
 - `src/server.ts` (MCP tools and prompts)

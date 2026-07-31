@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-07-31 - README + repo trim
+- README covers Cursor and VS Code, generic configure templates, full directive table, conversational how-it-works
+- Real demo screenshot (`docs/assets/demo.png`) replaces blank storyboard GIF
+- Dropped maintainer-only docs, reviewed eval goldens, and demo-gif generator from the public tree
+
 ## 2026-07-31 - Docs voice pass
 - Public docs rewritten for plain technical English (less em-dash / marketing tone)
 

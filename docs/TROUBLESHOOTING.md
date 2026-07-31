@@ -48,4 +48,4 @@ npm run eval:mock
 npm run flake-check
 ```
 
-See [EVAL.md](./EVAL.md) and [SCORECARD.md](./SCORECARD.md).
+See [EVAL.md](./EVAL.md).

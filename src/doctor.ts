@@ -228,7 +228,7 @@ export function runDoctor(options: {
   findings.push({
     level: "ok",
     message:
-      'Soft gate: hosts can skip tools — recover with /optimize or "run the efficiency engine". Optional log: fixtures/dogfood/gate-log.csv (see docs/DOGFOOD_GATE.md).',
+      'Soft gate: hosts can skip tools. Recover with /optimize or "run the efficiency engine". Optional: fixtures/dogfood/gate-log.csv',
   });
   findings.push({
     level: "ok",
