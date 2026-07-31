@@ -77,7 +77,7 @@ export function runDoctor(options: {
     findings.push({
       level: "fail",
       message:
-        "No provider key/local endpoint in process env. Run: agent-efficiency-mcp configure --project <dir> --provider deepseek --api-key … (writes MCP env; never touches your app .env).",
+        "No provider key in this CLI process (normal for npx consumers). Keys live in Cursor mcp.json env — run configure, reload MCP, then retry optimize. Terminal doctor cannot see MCP-injected env.",
     });
   }
 

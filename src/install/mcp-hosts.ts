@@ -40,6 +40,20 @@ export function resolveHostsMode(raw?: string): HostsMode {
   return "auto";
 }
 
+function mcpConfigHasOurServer(configPath: string, rootKey: McpRootKey): boolean {
+  if (!fs.existsSync(configPath)) return false;
+  try {
+    const data = readJsonObject(configPath);
+    const servers = data[rootKey];
+    if (!servers || typeof servers !== "object" || Array.isArray(servers)) {
+      return false;
+    }
+    return MCP_SERVER_KEY in (servers as Record<string, unknown>);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * auto / cursor: Cursor only (no `.vscode` litter).
  * vscode: VS Code project only.
@@ -58,12 +72,19 @@ export function filterHostTargets(
       return t.id === "cursor-global";
     }
     if (options?.configure) {
-      if (t.id === "cursor-global") return Boolean(options.alsoGlobal);
+      if (t.id === "cursor-global") {
+        // Always sync keys when --also-global, OR when init already created a
+        // global entry (Cursor often prefers that process — empty env = fail).
+        return (
+          Boolean(options.alsoGlobal) ||
+          mcpConfigHasOurServer(t.configPath, t.rootKey)
+        );
+      }
       if (mode === "vscode") return t.id === "vscode-project";
       if (mode === "all") {
         return t.id === "cursor-project" || t.id === "vscode-project";
       }
-      // auto + cursor configure: project Cursor only
+      // auto + cursor configure: project Cursor (+ global if registered above)
       return t.id === "cursor-project";
     }
 

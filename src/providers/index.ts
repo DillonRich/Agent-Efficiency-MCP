@@ -139,8 +139,11 @@ function detectProvider(): Exclude<ProviderName, "auto"> {
     return "local";
   }
   throw new Error(
-    "No rewrite provider configured. Set a vendor key (DEEPSEEK/OPENAI/ANTHROPIC/GEMINI/XAI) " +
-      "or a local/OpenAI-compat endpoint (LOCAL_LLM_* or REWRITE_API_*). See .env.example.",
+    "No rewrite provider configured for this MCP process. " +
+      "Put DEEPSEEK_API_KEY (or another vendor key) in the Cursor MCP server env " +
+      "via: npx agent-efficiency-mcp configure --project <dir> --provider \"Deep Seek\" --api-key <KEY> --model flash " +
+      "(writes both project and global mcp.json when our server is registered). " +
+      "Then reload MCP. Package .env is only for local clone development — not required for npx consumers.",
   );
 }
 

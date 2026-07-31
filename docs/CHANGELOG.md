@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-07-30 — 1.4.6 Sync configure keys into global Cursor MCP
+- `configure` patches `~/.cursor/mcp.json` when our server is already registered there (fixes dual-entry empty-env failures)
+- Clearer “no provider” error: MCP env / configure, not package `.env` for npx consumers
+- Doctor FAIL without process env marked as expected for npx path
+
 ## 2026-07-24 — 1.4.5 Init copy polish
 - Next-steps note smart provider/model name mapping
 - Step 4: “Send a prompt” (drop “task”)
