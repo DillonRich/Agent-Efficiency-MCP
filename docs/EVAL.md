@@ -1,6 +1,6 @@
 # Evaluation Suite — Rewriter Quality Gate
 
-**Harness:** `npm run eval` · **Loop:** `npm run quality-loop` · **Program:** [IMPROVEMENT_PROGRAM.md](./IMPROVEMENT_PROGRAM.md)
+**Harness:** `npm run eval` · **Loop:** `npm run quality-loop` · **Quality layers:** [QUALITY.md](./QUALITY.md)
 
 ## Rubric (R1–R10)
 

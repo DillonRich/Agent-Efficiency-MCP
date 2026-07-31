@@ -1,7 +1,6 @@
 **/*.map
 infra/
 services/
-site/
 fixtures/eval/results/
 .env
 Agent_Efficiency_MCP.md

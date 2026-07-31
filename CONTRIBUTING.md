@@ -21,6 +21,14 @@ See also [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) and [SECURITY.md](./SECURITY
 - Update `docs/` when behavior changes.
 - By contributing, you agree your contributions are licensed under AGPL-3.0-only (same as the project), unless we arrange otherwise in writing.
 
+## Publish (maintainers)
+```bash
+npm run build && npm test && npm run smoke:offline
+# confirm .env is not in the tarball
+npm pack --dry-run
+npm publish --access public
+```
+
 ## Commercial use
 Closed-source licensing: see [docs/COMMERCIAL.md](docs/COMMERCIAL.md).
 

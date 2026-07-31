@@ -17,7 +17,7 @@ Metrics in `Agent_Efficiency_MCP.md` are factual (`PROMPTMCP_META`) — never ha
 
 ## Quantitative gates (R1–R10)
 
-See [IMPROVEMENT_PROGRAM.md](./IMPROVEMENT_PROGRAM.md) and live [SCORECARD.md](./SCORECARD.md).
+Rubric: [EVAL.md](./EVAL.md). Latest numbers: [SCORECARD.md](./SCORECARD.md).
 
 ```bash
 npm run quality-loop           # offline

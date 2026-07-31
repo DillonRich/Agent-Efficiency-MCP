@@ -1,25 +1,19 @@
-# Repository Structure
+# Repository structure
 
 ```text
-PromptMCP/
-├── .cursor/rules/          # Maintainer agent rules
-├── docs/                   # SSoT (PRODUCT, ARCHITECTURE, …)
-├── fixtures/eval/          # Eval cases / goldens
-├── src/
-│   ├── server.ts           # MCP stdio entry
-│   ├── engine.ts
-│   ├── context.ts
-│   ├── validate.ts
-│   ├── directives.ts       # @promptmcp: parser + post-process
-│   └── providers/          # deepseek, openai, anthropic, gemini, xai, local, openai_compat
-├── scripts/                # smoke, eval-providers
-├── templates/              # consumer Cursor rules
-├── site/                   # Optional static OSS landing (no billing)
-├── infra/                  # ARCHIVED commercial experiments (ignore)
-├── services/gateway/       # ARCHIVED metering stub (ignore)
-├── package.json
-├── LICENSE                 # AGPL-3.0-only
+Agent-Efficiency-MCP/
+├── README.md                 # Install + product entry
+├── LICENSE                   # AGPL-3.0-only
+├── SECURITY.md               # Vulnerability reporting
 ├── CONTRIBUTING.md
-└── README.md
+├── package.json
+├── src/                      # MCP server, CLI, providers, quality
+├── templates/                # PRIORITY 0 Cursor rules + host tips
+├── scripts/                  # smoke, eval, dogfood, quality-loop
+├── test/
+├── fixtures/eval/            # Eval cases (+ reviewed goldens)
+├── docs/                     # User + design docs (see docs/README.md)
+└── .github/                  # CI, issue/PR templates
 ```
 
+Runtime artifacts (not committed): `.env`, `.cursor/`, `Agent_Efficiency_MCP.md`, `.promptmcp/`, `dist/`.

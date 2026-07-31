@@ -23,17 +23,16 @@ npx agent-efficiency-mcp@latest doctor --project .
 
 Defaults: **project** `.cursor/mcp.json` only · flash-class **thinking off** · keys never in app `.env`.
 
-## Remaining before “good enough”
-1. Publish **1.4.8** to npm (`npm publish` with Automation token — OTP not required for granular tokens)
-2. Make GitHub repo **public** + About from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md)
-3. **Rotate** any API keys that appeared in chat logs
-4. One final Cursor testing round (messy + HQ) → stop
+## Shipped
+- npm **1.4.8** + public GitHub
+- Final Cursor quality pass (gate / freeze / GO / analysis-only) — good enough
 
 ## Nice later (not blocking)
 - Personal dogfood CSV n≥20 ([DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
 - VS Code smoke ([HOSTS.md](./HOSTS.md))
-- Windsurf best-effort
-- Replace storyboard demo GIF with a real capture if desired
+- Freeze UX: short clarifications without re-optimize
+- Real demo capture to replace storyboard GIF if desired
+- Rotate any keys that ever appeared in chat logs (hygiene)
 
 ## Origin
 https://share.google/aimode/OvN5swZbE704L26KA

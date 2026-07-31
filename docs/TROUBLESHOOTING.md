@@ -43,4 +43,4 @@ npm run quality-loop
 npm run eval:mock
 npm run flake-check
 ```
-See [IMPROVEMENT_PROGRAM.md](./IMPROVEMENT_PROGRAM.md) and [SCORECARD.md](./SCORECARD.md).
+See [EVAL.md](./EVAL.md) and [SCORECARD.md](./SCORECARD.md).

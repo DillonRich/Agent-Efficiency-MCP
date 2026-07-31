@@ -17,7 +17,6 @@ describe("product consistency", () => {
     assert.match(read("README.md"), /AGPL-3\.0/);
     assert.match(read("AGENTS.md"), /AGPL-3\.0/);
     assert.ok(!/\bMIT\b/.test(read("AGENTS.md")));
-    assert.ok(!/PromptMCP · MIT/.test(read("site/index.html")));
     assert.match(read("LICENSE"), /GNU AFFERO GENERAL PUBLIC LICENSE/i);
   });
 

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const resultsDir = join(root, "fixtures/eval/results");
-const outMd = join(root, "docs/EVAL_TREND.md");
+const outMd = join(root, "fixtures/eval/results/EVAL_TREND.md");
 
 interface Summary {
   provider?: string;

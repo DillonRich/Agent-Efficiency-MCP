@@ -182,7 +182,7 @@ ${
     : "## Latest eval\n_Not run this iteration (pass `--eval` when a provider key is available)._\n"
 }
 
-See [IMPROVEMENT_PROGRAM.md](./IMPROVEMENT_PROGRAM.md).
+See [EVAL.md](./EVAL.md) and [QUALITY.md](./QUALITY.md).
 `;
   writeFileSync(join(root, "docs/SCORECARD.md"), scorecard, "utf8");
   console.error(`Wrote docs/SCORECARD.md and ${loopPath}`);
