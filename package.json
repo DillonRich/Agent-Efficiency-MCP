@@ -15,6 +15,7 @@
     "init": "tsx src/cli.ts init",
     "dev": "tsx src/server.ts",
     "smoke": "tsx scripts/smoke.ts",
+    "smoke:offline": "tsx scripts/smoke.ts --offline",
     "test": "tsx --test test/**/*.test.ts",
     "test:ci": "npm run build && npm test",
     "eval": "tsx scripts/eval-providers.ts",
@@ -28,7 +29,7 @@
     "demo-gif": "node scripts/make-demo-gif.mjs",
     "doctor": "tsx src/cli.ts doctor",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run typecheck && npm test && npm run smoke && npm run eval:mock && npm run flake-check && npm run auto-dogfood"
+    "prepublishOnly": "npm run build && npm run typecheck && npm test && npm run smoke:offline && npm run eval:mock && npm run flake-check && npm run auto-dogfood"
   },
   "keywords": [
     "mcp",

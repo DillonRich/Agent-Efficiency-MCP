@@ -238,10 +238,11 @@ function testProviderAliases(): void {
 
 async function testLiveRewrite(): Promise<void> {
   const offline =
+    process.argv.includes("--offline") ||
     process.env.PROMPT_MCP_SMOKE_OFFLINE === "1" ||
     process.env.PROMPT_MCP_SMOKE_OFFLINE === "true";
   if (offline) {
-    console.error("[skip] live rewrite — PROMPT_MCP_SMOKE_OFFLINE=1");
+    console.error("[skip] live rewrite — offline smoke (publish/CI)");
     return;
   }
 
@@ -262,28 +263,48 @@ async function testLiveRewrite(): Promise<void> {
     return;
   }
 
-  const ctx = gatherWorkspaceContext(root);
-  const result = await generateOptimizedBlueprint(
-    "Hey can you please make a super clean and elegant tiny helper that just logs hello somehow in this project? thanks!!",
-    ctx,
-  );
+  try {
+    const ctx = gatherWorkspaceContext(root);
+    const result = await generateOptimizedBlueprint(
+      "Hey can you please make a super clean and elegant tiny helper that just logs hello somehow in this project? thanks!!",
+      ctx,
+    );
 
-  assert(result.blueprint.includes("Absolute Objective"), "missing Absolute Objective");
-  assert(!/```/.test(result.blueprint), "live blueprint should not retain code fences");
-  writeFileSync(join(root, "Agent_Efficiency_MCP.smoke.md"), result.blueprint, "utf8");
-  console.error(
-    `[ok] live rewrite via ${result.provider}/${result.model} (wrote Agent_Efficiency_MCP.smoke.md)`,
-  );
-  assert(
-    /PROMPTMCP_META/i.test(result.blueprint),
-    "factual metrics header present",
-  );
-  assert(
-    !/Estimated Dev Time Saved/i.test(result.blueprint),
-    "no hallucinated time-saved metrics",
-  );
-  if (result.warnings.length) {
-    console.error("[warn]", result.warnings.join(" | "));
+    assert(
+      result.blueprint.includes("Absolute Objective"),
+      "missing Absolute Objective",
+    );
+    assert(
+      !/```/.test(result.blueprint),
+      "live blueprint should not retain code fences",
+    );
+    writeFileSync(
+      join(root, "Agent_Efficiency_MCP.smoke.md"),
+      result.blueprint,
+      "utf8",
+    );
+    console.error(
+      `[ok] live rewrite via ${result.provider}/${result.model} (wrote Agent_Efficiency_MCP.smoke.md)`,
+    );
+    assert(
+      /PROMPTMCP_META/i.test(result.blueprint),
+      "factual metrics header present",
+    );
+    assert(
+      !/Estimated Dev Time Saved/i.test(result.blueprint),
+      "no hallucinated time-saved metrics",
+    );
+    if (result.warnings.length) {
+      console.error("[warn]", result.warnings.join(" | "));
+    }
+  } catch (err) {
+    // Bad/expired package .env must not block npm publish or local smoke.
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/auth failed|401|403|No rewrite provider|circuit/i.test(msg)) {
+      console.error("[skip] live rewrite — provider auth/config error:", msg);
+      return;
+    }
+    throw err;
   }
 }
 
