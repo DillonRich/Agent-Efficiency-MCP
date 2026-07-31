@@ -1,31 +1,39 @@
 # Status
 
-**Last updated:** 2026-07-23  
+**Last updated:** 2026-07-31  
+**Version target:** **1.4.8** (launch pack)  
 **Direction:** **Open-source · local-only · BYOK** (AGPL-3.0-only + commercial dual-license)
 
-## Confidence (engineering)
-**High for the product loop under test** — not “hosts never skip tools.”
+## Launch readiness
+**Ship-quality for Cursor.** Soft gate cannot force tool calls — recovery phrases work.
 
-Verified:
-- **50/50** automated tests (unit + contract + MCP stdio + CLI + polish/providers + consistency)
-- Offline gates: smoke, mock eval **100**, flake spread **0**, auto-dogfood **PASS**, quality-loop, lean context **−86%**
-- Live DeepSeek eval: mean composite **100**
-- Soft-gate surfaces aligned (rules merge block, hosts, README recovery phrases)
-- SaaS/market/Azure docs scrubbed of live monetization / personal lab details
+Verified product loop (Cursor / Guardian dogfood):
+- Messy-prompt round ~**9.0/10** (gate, freeze, GO, ignore/help/file/scope)
+- HQ-prompt round ~**8.4/10** → polish in 1.4.7 (false paths, depth, analysis-only verify)
+- Offline CI: unit/contract/stdio/CLI + smoke:offline + mock eval + flake + auto-dogfood
 
-## Ship sequence (agreed)
-1. Perfect tool (this phase) → commit
-2. Push to GitHub (needs `gh auth login`)
-3. Manual polish later (real demo GIF)
-4. Personal dogfood / final testing
-5. Public + npm `1.4.0` + Sponsors
+## One-page install (Cursor)
+```bash
+npx agent-efficiency-mcp@latest init --project .
+npx agent-efficiency-mcp@latest configure --project . --provider "Deep Seek" --api-key "<KEY>" --model flash
+# Reload MCP → send a prompt → review Agent_Efficiency_MCP.md → type GO
+# Skip recovery: /optimize  or  "run the efficiency engine"
+npx agent-efficiency-mcp@latest doctor --project .
+```
 
-## Remaining maintainer actions
-1. GitHub auth + `git push -u origin master`
-2. `npm publish --access public --otp <code>` (after push)
-3. Personal dogfood log n≥20 ([DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
-4. Optional real demo GIF replace [`docs/assets/demo.gif`](./assets/demo.gif)
-5. GitHub About from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md)
+Defaults: **project** `.cursor/mcp.json` only · flash-class **thinking off** · keys never in app `.env`.
+
+## Remaining before “good enough”
+1. Publish **1.4.8** to npm (`npm publish` with Automation token — OTP not required for granular tokens)
+2. Make GitHub repo **public** + About from [REPO_DESCRIPTION.md](./REPO_DESCRIPTION.md)
+3. **Rotate** any API keys that appeared in chat logs
+4. One final Cursor testing round (messy + HQ) → stop
+
+## Nice later (not blocking)
+- Personal dogfood CSV n≥20 ([DOGFOOD_GATE.md](./DOGFOOD_GATE.md))
+- VS Code smoke ([HOSTS.md](./HOSTS.md))
+- Windsurf best-effort
+- Replace storyboard demo GIF with a real capture if desired
 
 ## Origin
 https://share.google/aimode/OvN5swZbE704L26KA

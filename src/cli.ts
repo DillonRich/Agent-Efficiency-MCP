@@ -93,7 +93,8 @@ Init / configure / uninstall options:
   --thinking on|off   configure: force thinking enabled/disabled (DeepSeek V4+)
   --max-tokens <n>    configure: REWRITE_MAX_TOKENS for the rewrite API call
   --temperature <n>   configure: REWRITE_TEMPERATURE (default 0.1)
-  --also-global       configure: also write keys into ~/.cursor/mcp.json (default: project only)
+  --also-global       init: also register ~/.cursor/mcp.json; configure: also write keys there
+                      (default: project .cursor/mcp.json only)
   --purge             uninstall: delete blueprint .md(s), entire .promptmcp/, empty mcp husks
 
 Keys are stored in the MCP server env block (mcp.json) — we never create or edit your app's .env.
@@ -251,7 +252,7 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
       resolveHostTargets(projectRoot),
       projectRoot,
       opts.hosts,
-      { globalOnly: opts.globalOnly },
+      { globalOnly: opts.globalOnly, alsoGlobal: opts.alsoGlobal },
     );
 
     for (const t of targets) {
@@ -344,21 +345,21 @@ async function runInit(opts: ReturnType<typeof parseArgs>): Promise<void> {
 
   console.log("Done. Next steps:");
   console.log(
-    "  1. Set your BYOK rewrite key (MCP env only — no app .env; path is your project):",
+    "  1. Set your BYOK rewrite key (MCP env only — no app .env):",
   );
   console.log(
     `     npx agent-efficiency-mcp configure --project "${projectRoot}" --provider "<PROVIDER>" --api-key "<YOUR_KEY>" --model "<MODEL>"`,
   );
   console.log(
-    '     Optional: --effort none|low|medium|high|max  --thinking on|off  --max-tokens 8192',
+    '     Optional: --effort none|low|medium|high|max  --thinking on|off  --max-tokens 8192  --also-global',
   );
   console.log(
-    "     Names are flexible (smart mapping): Deep Seek ≈ deepseek, flash ≈ deepseek-v4-flash, etc.",
+    "     Names are flexible: Deep Seek ≈ deepseek, flash ≈ deepseek-v4-flash (thinking off by default).",
   );
   console.log(
     '     Examples: --provider "Deep Seek" --model flash   or   --model "pro:max"',
   );
-  console.log("  2. Restart / reload MCP in your IDE");
+  console.log("  2. Reload MCP / restart the IDE");
   console.log("  3. Confirm server `agent-efficiency-engine` is connected");
   console.log(
     `  4. Send a prompt → review ${BLUEPRINT_FILENAME} → type GO`,

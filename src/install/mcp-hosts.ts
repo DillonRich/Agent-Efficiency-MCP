@@ -55,10 +55,10 @@ function mcpConfigHasOurServer(configPath: string, rootKey: McpRootKey): boolean
 }
 
 /**
- * auto / cursor: Cursor only (no `.vscode` litter).
+ * auto / cursor: Cursor project only by default (no global litter).
  * vscode: VS Code project only.
- * all: every target (exotic still gated by onlyIfHostDirExists).
- * Use `--hosts all` if you intentionally want multi-IDE project configs.
+ * all: every project target (+ optional global with --also-global).
+ * Use `--hosts all` for multi-IDE project configs; `--also-global` for ~/.cursor.
  */
 export function filterHostTargets(
   targets: HostTarget[],
@@ -73,8 +73,8 @@ export function filterHostTargets(
     }
     if (options?.configure) {
       if (t.id === "cursor-global") {
-        // Always sync keys when --also-global, OR when init already created a
-        // global entry (Cursor often prefers that process — empty env = fail).
+        // Sync keys when --also-global, OR when a prior init left a global entry
+        // (Cursor may prefer that process — empty env = fail).
         return (
           Boolean(options.alsoGlobal) ||
           mcpConfigHasOurServer(t.configPath, t.rootKey)
@@ -88,10 +88,14 @@ export function filterHostTargets(
       return t.id === "cursor-project";
     }
 
+    // init
+    if (t.id === "cursor-global") {
+      return Boolean(options?.alsoGlobal);
+    }
     if (mode === "vscode") return t.id === "vscode-project";
     if (mode === "all") return true;
-    // auto + cursor init: Cursor global + project only
-    return t.id.startsWith("cursor");
+    // auto + cursor init: project Cursor only
+    return t.id === "cursor-project";
   });
 }
 

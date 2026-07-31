@@ -230,6 +230,79 @@ describe("mcp launch", () => {
     assert.equal(env.REWRITE_REASONING_EFFORT, "high");
     assert.equal(env.REWRITE_THINKING, "enabled");
   });
+
+  it("defaults flash-class models to thinking disabled", () => {
+    const env = buildConfigureEnv({
+      provider: "deepseek",
+      apiKey: "sk-abc",
+      model: "flash",
+    });
+    assert.equal(env.REWRITE_MODEL, "deepseek-v4-flash");
+    assert.equal(env.REWRITE_THINKING, "disabled");
+  });
+});
+
+import {
+  isFlashClassModel,
+  resolveRewriteRequestOptions,
+} from "../src/providers/rewrite-options.js";
+import { filterHostTargets, resolveHostTargets } from "../src/install/mcp-hosts.js";
+import { mcpConfigHasProviderKey } from "../src/doctor.js";
+
+describe("flash thinking + host defaults", () => {
+  it("classifies flash-tier model ids", () => {
+    assert.equal(isFlashClassModel("deepseek-v4-flash"), true);
+    assert.equal(isFlashClassModel("gemini-2.5-flash"), true);
+    assert.equal(isFlashClassModel("claude-haiku-4-5"), true);
+    assert.equal(isFlashClassModel("deepseek-v4-pro"), false);
+  });
+
+  it("resolveRewriteRequestOptions defaults flash thinking off", () => {
+    process.env.REWRITE_MODEL = "deepseek-v4-flash";
+    delete process.env.REWRITE_THINKING;
+    delete process.env.REWRITE_REASONING_EFFORT;
+    delete process.env.REWRITE_EFFORT;
+    const opts = resolveRewriteRequestOptions();
+    assert.deepEqual(opts.thinking, { type: "disabled" });
+    delete process.env.REWRITE_MODEL;
+  });
+
+  it("init filter is project Cursor only unless --also-global", () => {
+    const targets = resolveHostTargets("/tmp/demo-proj");
+    const projectOnly = filterHostTargets(targets, "/tmp/demo-proj", "auto");
+    assert.deepEqual(
+      projectOnly.map((t) => t.id),
+      ["cursor-project"],
+    );
+    const withGlobal = filterHostTargets(targets, "/tmp/demo-proj", "auto", {
+      alsoGlobal: true,
+    });
+    assert.ok(withGlobal.some((t) => t.id === "cursor-global"));
+    assert.ok(withGlobal.some((t) => t.id === "cursor-project"));
+  });
+
+  it("doctor detects keys in mcp.json env", () => {
+    const dir = mkdtempSync(join(tmpdir(), "aee-doctor-"));
+    try {
+      const mcp = join(dir, "mcp.json");
+      writeFileSync(
+        mcp,
+        JSON.stringify({
+          mcpServers: {
+            "agent-efficiency-engine": {
+              command: "npx",
+              env: { DEEPSEEK_API_KEY: "sk-from-mcp" },
+            },
+          },
+        }) + "\n",
+      );
+      const hit = mcpConfigHasProviderKey(mcp, "mcpServers");
+      assert.equal(hit.present, true);
+      assert.equal(hit.keyName, "DEEPSEEK_API_KEY");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 import { normalizeProviderName } from "../src/providers/index.js";

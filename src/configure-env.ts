@@ -8,6 +8,7 @@ import {
 } from "./providers/model.js";
 import {
   effortImpliesThinking,
+  isFlashClassModel,
   normalizeEffort,
 } from "./providers/rewrite-options.js";
 
@@ -63,6 +64,15 @@ export function buildConfigureEnv(opts: {
     out.REWRITE_REASONING_EFFORT = effort;
     const implied = effortImpliesThinking(effort);
     if (implied && !thinking) thinking = implied;
+  }
+
+  // Flash-class: default thinking off unless user set effort/thinking
+  if (
+    !thinking &&
+    !effort &&
+    isFlashClassModel(out.REWRITE_MODEL || modelToken)
+  ) {
+    thinking = "disabled";
   }
 
   if (thinking) {

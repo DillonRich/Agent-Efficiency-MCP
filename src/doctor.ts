@@ -16,18 +16,71 @@ export interface DoctorReport {
   ok: boolean;
 }
 
+const KEY_ENV_NAMES = [
+  "DEEPSEEK_API_KEY",
+  "OPENAI_API_KEY",
+  "ANTHROPIC_API_KEY",
+  "GEMINI_API_KEY",
+  "XAI_API_KEY",
+  "GROK_API_KEY",
+  "REWRITE_API_KEY",
+  "LOCAL_LLM_API_KEY",
+  "LOCAL_LLM_BASE",
+  "LOCAL_LLM_MODEL",
+];
+
 function hasAnyProviderKey(): boolean {
-  return Boolean(
-    process.env.DEEPSEEK_API_KEY?.trim() ||
-      process.env.OPENAI_API_KEY?.trim() ||
-      process.env.ANTHROPIC_API_KEY?.trim() ||
-      process.env.GEMINI_API_KEY?.trim() ||
-      process.env.XAI_API_KEY?.trim() ||
-      process.env.GROK_API_KEY?.trim() ||
-      process.env.REWRITE_API_KEY?.trim() ||
-      process.env.LOCAL_LLM_BASE?.trim() ||
-      process.env.LOCAL_LLM_MODEL?.trim(),
-  );
+  return KEY_ENV_NAMES.some((k) => Boolean(process.env[k]?.trim()));
+}
+
+function readJsonObject(filePath: string): Record<string, unknown> | null {
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+/** Inspect MCP mcp.json for our server env keys (consumer path). */
+export function mcpConfigHasProviderKey(
+  configPath: string,
+  rootKey: "mcpServers" | "servers",
+): { present: boolean; keyName?: string; redacted?: string } {
+  if (!fs.existsSync(configPath)) return { present: false };
+  const data = readJsonObject(configPath);
+  if (!data) return { present: false };
+  const servers = data[rootKey];
+  if (!servers || typeof servers !== "object" || Array.isArray(servers)) {
+    return { present: false };
+  }
+  const entry = (servers as Record<string, unknown>)[MCP_SERVER_KEY];
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+    return { present: false };
+  }
+  const env = (entry as { env?: Record<string, unknown> }).env;
+  if (!env || typeof env !== "object") return { present: false };
+
+  for (const name of KEY_ENV_NAMES) {
+    const v = env[name];
+    if (typeof v === "string" && v.trim()) {
+      const t = v.trim();
+      // Placeholder leftovers
+      if (/^your[_-]?key$/i.test(t) || t === "YOUR_KEY" || t === "sk-YOUR") {
+        continue;
+      }
+      return {
+        present: true,
+        keyName: name,
+        redacted: t.slice(0, 4) + "…",
+      };
+    }
+  }
+  return { present: false };
 }
 
 function configMentionsServer(filePath: string): boolean {
@@ -50,7 +103,10 @@ export function runDoctor(options: {
   const serverJs = path.join(packageRoot, "dist", "server.js");
   const cliJs = path.join(packageRoot, "dist", "cli.js");
   if (fs.existsSync(serverJs) && fs.existsSync(cliJs)) {
-    findings.push({ level: "ok", message: `Built artifacts present (${serverJs})` });
+    findings.push({
+      level: "ok",
+      message: `Built artifacts present (${serverJs})`,
+    });
   } else {
     findings.push({
       level: "fail",
@@ -64,20 +120,44 @@ export function runDoctor(options: {
   } else {
     findings.push({
       level: "warn",
-      message: `No package .env at ${envPath} — keys may still be in MCP env`,
+      message: `No package .env at ${envPath} — normal for npx; keys should be in MCP mcp.json`,
     });
   }
 
-  if (hasAnyProviderKey()) {
+  const processHasKey = hasAnyProviderKey();
+  let mcpKeyHit:
+    | { present: true; label: string; keyName: string; redacted: string }
+    | undefined;
+
+  for (const t of resolveHostTargets(projectRoot)) {
+    if (!configMentionsServer(t.configPath)) continue;
+    const hit = mcpConfigHasProviderKey(t.configPath, t.rootKey);
+    if (hit.present && hit.keyName && hit.redacted) {
+      mcpKeyHit = {
+        present: true,
+        label: t.label,
+        keyName: hit.keyName,
+        redacted: hit.redacted,
+      };
+      break;
+    }
+  }
+
+  if (processHasKey) {
     findings.push({
       level: "ok",
-      message: `Provider credentials detected (REWRITE_PROVIDER=${process.env.REWRITE_PROVIDER || "auto"})`,
+      message: `Provider credentials in process env (REWRITE_PROVIDER=${process.env.REWRITE_PROVIDER || "auto"})`,
+    });
+  } else if (mcpKeyHit) {
+    findings.push({
+      level: "ok",
+      message: `Provider key in MCP env (${mcpKeyHit.keyName}=${mcpKeyHit.redacted} via ${mcpKeyHit.label}) — reload MCP if optimize still fails`,
     });
   } else {
     findings.push({
       level: "fail",
       message:
-        "No provider key in this CLI process (normal for npx consumers). Keys live in Cursor mcp.json env — run configure, reload MCP, then retry optimize. Terminal doctor cannot see MCP-injected env.",
+        "No provider key in process env or MCP mcp.json. Run: agent-efficiency-mcp configure --project <dir> --provider \"Deep Seek\" --api-key <KEY> --model flash",
     });
   }
 
@@ -124,6 +204,17 @@ export function runDoctor(options: {
         level: "ok",
         message: `MCP registered in ${t.label}: ${t.configPath}`,
       });
+      const keyCheck = mcpConfigHasProviderKey(t.configPath, t.rootKey);
+      if (
+        t.id.startsWith("cursor") &&
+        configMentionsServer(t.configPath) &&
+        !keyCheck.present
+      ) {
+        findings.push({
+          level: "warn",
+          message: `${t.label} has our server but no API key in env — run configure (or --also-global if this is the global entry)`,
+        });
+      }
     }
   }
   if (mcpHits === 0) {
@@ -137,12 +228,12 @@ export function runDoctor(options: {
   findings.push({
     level: "ok",
     message:
-      "Soft gate note: hosts can skip tools — recover with /optimize or \"run the efficiency engine\". Log turns in fixtures/dogfood/gate-log.csv; summarize with npm run dogfood-summary.",
+      'Soft gate: hosts can skip tools — recover with /optimize or "run the efficiency engine". Optional log: fixtures/dogfood/gate-log.csv (see docs/DOGFOOD_GATE.md).',
   });
   findings.push({
     level: "ok",
     message:
-      "Docs: docs/TROUBLESHOOTING.md · uninstall: agent-efficiency-mcp uninstall --project <dir>",
+      "Docs: docs/INSTALL.md · uninstall: agent-efficiency-mcp uninstall --project <dir> --purge",
   });
 
   const ok = !findings.some((f) => f.level === "fail");

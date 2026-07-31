@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-07-31 — 1.4.8 Launch pack
+- `doctor` treats MCP `mcp.json` env keys as valid credentials (no false FAIL for npx)
+- `init` defaults to **project** Cursor MCP only; `--also-global` opt-in for `~/.cursor/mcp.json`
+- Flash-class models default **thinking off** (override with `--effort` / `--thinking on`)
+- Docs: one-page install, STATUS refresh, VS Code smoke notes, dogfood n≥20 guidance
+
 ## 2026-07-30 — 1.4.7 HQ-prompt polish
 - Stop treating English `a/b` phrases (`start/end`, `P0/P1`, `Rust/Tauri`) as forced paths
 - Depth scaling in quality rubric (short asks stay compact; long/novel can expand)

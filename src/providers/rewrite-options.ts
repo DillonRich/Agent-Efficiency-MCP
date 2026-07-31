@@ -59,6 +59,30 @@ function parseThinking(raw: string | undefined): ThinkingMode | undefined {
   return undefined;
 }
 
+/** Cheap / flash-tier models — default thinking off unless effort asks for it. */
+export function isFlashClassModel(model: string | undefined): boolean {
+  if (!model?.trim()) return false;
+  const m = model.trim().toLowerCase();
+  if (m.includes("flash")) return true;
+  if (m.includes("haiku")) return true;
+  if (m.includes("gpt-4.1-mini") || m.includes("gpt-4o-mini")) return true;
+  if (m.includes("grok-3-mini") || m.includes("grok-4-mini")) return true;
+  return false;
+}
+
+function resolveConfiguredModelId(): string | undefined {
+  return (
+    process.env.REWRITE_MODEL?.trim() ||
+    process.env.DEEPSEEK_MODEL?.trim() ||
+    process.env.OPENAI_MODEL?.trim() ||
+    process.env.ANTHROPIC_MODEL?.trim() ||
+    process.env.GEMINI_MODEL?.trim() ||
+    process.env.XAI_MODEL?.trim() ||
+    process.env.LOCAL_LLM_MODEL?.trim() ||
+    process.env.REWRITE_API_MODEL?.trim()
+  );
+}
+
 /** Read knobs from process.env (MCP server env / package .env). */
 export function resolveRewriteRequestOptions(): RewriteRequestOptions {
   const out: RewriteRequestOptions = {};
@@ -81,9 +105,14 @@ export function resolveRewriteRequestOptions(): RewriteRequestOptions {
     process.env.REWRITE_REASONING_EFFORT?.trim() ||
       process.env.REWRITE_EFFORT?.trim(),
   );
-  const thinking =
+  let thinking =
     parseThinking(process.env.REWRITE_THINKING?.trim()) ||
     effortImpliesThinking(effort);
+
+  // Flash-class defaults to thinking off (cheaper/faster) unless effort enables it
+  if (!thinking && isFlashClassModel(resolveConfiguredModelId())) {
+    thinking = "disabled";
+  }
 
   if (thinking) out.thinking = { type: thinking };
   if (effort && effort !== "none") {

@@ -12,12 +12,14 @@ Runs install → doctor → mock optimize turns for all eval cases → freeze co
 ## How to use (personal / real host)
 1. Copy [`fixtures/dogfood/gate-log.template.csv`](../fixtures/dogfood/gate-log.template.csv) to `fixtures/dogfood/gate-log.csv` (gitignored).
 2. For each real Cursor/Claude/VS Code turn that *should* have gated, add a row.
-3. After ≥20 rows, compute first-call rate:
+3. **Ship bar for maintainers:** log **n≥20** expected-gate turns (mix of messy + HQ prompts across a few sessions), then compute first-call rate. Not a release blocker for Cursor launch — use it to track soft-gate drift after publish.
 
 ```text
 first_call_rate = count(outcome=called) / count(rows where expected=yes)
 target ≥ 0.70
 ```
+
+Optional after VS Code smoke ([HOSTS.md](./HOSTS.md)): add a few rows with `host=vscode` so Cursor and VS Code rates stay comparable.
 
 ## Outcome values
 | outcome | Meaning |
