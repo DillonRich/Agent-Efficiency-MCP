@@ -1,31 +1,35 @@
 # Gate compliance dogfood log
 
-Manual tracking for host soft-gate success (MCP cannot force tool calls).
+Manual tracking for host soft-gate success. MCP cannot force tool calls.
 
 ## Automated dogfood (offline)
+
 ```bash
 npm run auto-dogfood
 ```
-Runs install → doctor → mock optimize turns for all eval cases → freeze contract checks → `dogfood-summary` on a synthetic CSV.  
-**Important:** synthetic host outcomes prove tooling + product loop; they do **not** replace personal Cursor first-call logging.
 
-## How to use (personal / real host)
+Runs install → doctor → mock optimize turns for all eval cases → freeze contract checks → `dogfood-summary` on a synthetic CSV.
+
+Synthetic host outcomes prove tooling and the product loop. They do **not** replace personal Cursor first-call logging.
+
+## Personal / real host log
 1. Copy [`fixtures/dogfood/gate-log.template.csv`](../fixtures/dogfood/gate-log.template.csv) to `fixtures/dogfood/gate-log.csv` (gitignored).
-2. For each real Cursor/Claude/VS Code turn that *should* have gated, add a row.
-3. **Ship bar for maintainers:** log **n≥20** expected-gate turns (mix of messy + HQ prompts across a few sessions), then compute first-call rate. Not a release blocker for Cursor launch — use it to track soft-gate drift after publish.
+2. For each real Cursor/Claude/VS Code turn that should have gated, add a row.
+3. After **n≥20** expected-gate turns (mix of messy and HQ prompts), compute first-call rate. Useful for tracking soft-gate drift after publish. Not a release blocker.
 
 ```text
 first_call_rate = count(outcome=called) / count(rows where expected=yes)
 target ≥ 0.70
 ```
 
-Optional after VS Code smoke ([HOSTS.md](./HOSTS.md)): add a few rows with `host=vscode` so Cursor and VS Code rates stay comparable.
+After a VS Code smoke ([HOSTS.md](./HOSTS.md)), add a few rows with `host=vscode` so rates stay comparable.
 
 ## Outcome values
+
 | outcome | Meaning |
 |---------|---------|
 | `called` | Host called `optimize_and_blueprint_intent` on first response |
-| `skipped` | Host answered/coded without the tool |
+| `skipped` | Host answered or coded without the tool |
 | `recovered` | Skipped first, then `/optimize` or “run the efficiency engine” recovered |
 
 ## Tips that raise rate

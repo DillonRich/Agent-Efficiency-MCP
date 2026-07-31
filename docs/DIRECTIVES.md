@@ -2,11 +2,11 @@
 
 Directives are optional tags you put in a chat message to control how PromptMCP rewrites your prompt into `Agent_Efficiency_MCP.md`.
 
-They are **composable**: use any combination, in any order, as many times as you want. Repeated `file` / `media` / `search` tags merge into one list.
+They are composable. Use any combination, in any order. Repeated `file` / `media` / `search` tags merge into one list.
 
 ## Prefixes
 
-These are equivalent — pick whichever you prefer:
+These are equivalent. Pick whichever you prefer:
 
 | Prefix | Notes |
 |--------|--------|
@@ -73,7 +73,7 @@ The machine rewrite stays at the top (dense, structured). Your cleaned original 
 
 ```text
 @promptmcp:include
-Please carefully migrate the auth flow — I really care about not breaking existing sessions.
+Please carefully migrate the auth flow. I really care about not breaking existing sessions.
 ```
 
 Tradeoff: more tokens for the coding agent after `GO`, higher fidelity.
@@ -150,20 +150,20 @@ After `GO`, the agent should browse those links and apply the notes. PromptMCP d
 
 ### `long`
 
-**Deep, iterative worklist** — phases, ordered steps, longer verification checklist.
+Deep, iterative worklist. Phases, ordered steps, longer verification checklist.
 
 ```text
 @promptmcp:long
 Turn this messy roadmap into a full implementation plan for the billing module…
 ```
 
-Prefer when the task is large, multi-day, or you want a long working agenda — not a single short step.
+Use for large or multi-day work, not a single short step.
 
 ---
 
 ### `short`
 
-**Aggressive compression** — minimal vectors, few bullets, one crisp objective.
+Aggressive compression. Minimal vectors, few bullets, one crisp objective.
 
 ```text
 @promptmcp:short
@@ -193,7 +193,7 @@ Still strips empty pleasantries (“please”, “can you help”), but keeps si
 
 ```text
 @promptmcp:tone
-This is CRITICAL — do not touch the legacy billing path under any circumstances.
+This is CRITICAL. Do not touch the legacy billing path under any circumstances.
 ```
 
 ---
@@ -232,7 +232,7 @@ Print the directive cheat-sheet. If the message is **only** `help` (no task text
 
 ## Combining directives
 
-Anything goes — flags + args together:
+Flags and args together:
 
 ```text
 @promptmcp:include @promptmcp:long @promptmcp:test @promptmcp:strict

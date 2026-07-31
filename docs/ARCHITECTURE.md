@@ -42,17 +42,15 @@
 | Env config | `.env` / MCP `env` | BYOK provider keys (`REWRITE_PROVIDER=auto` …) |
 | Blueprint artifact | `Agent_Efficiency_MCP.md` (runtime, gitignored) | Human + agent HUD |
 
-Archived (not product path): `services/gateway`, `infra/stripe`, `infra/resend`, `infra/azure`.
-
 ## Trust boundaries
-- **Local only:** MCP process holds *your* provider key; calls that provider directly from your machine.
-- No PromptMCP cloud, metering, or license key. Prompts never leave your machine except to the LLM API you configured.
+- Local only. The MCP process holds your provider key and calls that provider from your machine.
+- No PromptMCP cloud, metering, or license key. Prompts leave your machine only to the LLM API you configured.
 
-## MCP constraints (hard truths)
-1. MCP servers are **reactive**. They cannot block the IDE or inject custom chat widgets.
-2. Freeze behavior is achieved by: aggressive tool description + consumer rules + tool return text that asks a direct question and forbids further tool use.
-3. Reliability is high with frontier models + strict rules, but never 100% protocol-enforced.
-4. **Do not use `process.cwd()` alone** for writing blueprints — Cursor often sets cwd to the MCP install directory.
+## MCP constraints
+1. MCP servers are reactive. They cannot block the IDE or inject custom chat widgets.
+2. Freeze behavior comes from the tool description, consumer rules, and return text that asks for `GO` and forbids further tool use.
+3. Reliability is high with strong host models and strict rules. It is never 100% protocol-enforced.
+4. Do not rely on `process.cwd()` alone when writing blueprints. Cursor often sets cwd to the MCP install directory.
 
 ## Context strategy
 

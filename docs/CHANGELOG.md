@@ -2,11 +2,14 @@
 
 Newest first.
 
-## 2026-07-31 — Repo hygiene
+## 2026-07-31 - Docs voice pass
+- Public docs rewritten for plain technical English (less em-dash / marketing tone)
+
+## 2026-07-31 - Repo hygiene
 - Removed archived/internal docs (Azure lab, market sizing, publish/demo checklists, eval trend dumps) and unused `site/` landing
 - Docs index rebuilt around user install + design + quality; trends write under gitignored `fixtures/eval/results/`
 
-## 2026-07-31 — 1.4.8 Launch pack
+## 2026-07-31 - 1.4.8 Launch pack
 - `doctor` treats MCP `mcp.json` env keys as valid credentials (no false FAIL for npx)
 - `init` defaults to **project** Cursor MCP only; `--also-global` opt-in for `~/.cursor/mcp.json`
 - Flash-class models default **thinking off** (override with `--effort` / `--thinking on`)

@@ -1,16 +1,16 @@
-# Agent Entrypoint
+# Agent entrypoint
 
-**PromptMCP** — AGPL-3.0-only local BYOK MCP: rewrite → `Agent_Efficiency_MCP.md` → freeze until `GO`.
+PromptMCP. AGPL-3.0-only local BYOK MCP. Rewrite to `Agent_Efficiency_MCP.md`, freeze until `GO`.
 
 ## Read
-1. [docs/STATUS.md](docs/STATUS.md) — OSS direction
+1. [docs/STATUS.md](docs/STATUS.md)
 2. [docs/PRODUCT.md](docs/PRODUCT.md)
-3. [docs/ENGINE.md](docs/ENGINE.md) — providers
+3. [docs/ENGINE.md](docs/ENGINE.md)
 
 ## Code
-- `src/server.ts` — MCP tools/prompts
-- `src/providers/*` — deepseek, openai, anthropic, gemini, xai, local, openai_compat, mock, auto
-- `templates/00-promptmcp.mdc` — PRIORITY 0 host rules
+- `src/server.ts` (MCP tools and prompts)
+- `src/providers/*` (deepseek, openai, anthropic, gemini, xai, local, openai_compat, mock, auto)
+- `templates/00-promptmcp.mdc` (PRIORITY 0 host rules)
 
 ## Commands
 `npm run build` · `npm test` · `npm run smoke` · `npm run auto-dogfood` · `npm run eval:mock`

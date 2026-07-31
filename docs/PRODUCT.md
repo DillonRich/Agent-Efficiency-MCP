@@ -1,51 +1,46 @@
 # Product
 
-## Working name
-**PromptMCP** (Agent Efficiency Engine)
+## Name
+**PromptMCP** (npm / CLI: Agent Efficiency Engine)
 
-## One-liner
-Open-source local MCP server that rewrites messy IDE prompts into dense engineering blueprints, writes `Agent_Efficiency_MCP.md`, and freezes the coding agent until you type `GO`.
+## What it is
+A local MCP server that rewrites IDE prompts into a structured blueprint (`Agent_Efficiency_MCP.md`) and freezes the coding agent until you type `GO`.
 
-## Distribution model
-**AGPL-3.0-only open source · local-only · bring your own API key (BYOK).**  
-No paid cloud subscription for the tool itself. Closed-source / proprietary use requires a commercial license ([COMMERCIAL.md](./COMMERCIAL.md)). Users install the MCP, put their own provider key in the MCP server `env` (via `configure`), and run entirely on their machine.
+## License and distribution
+AGPL-3.0-only, local-only, bring your own API key. No paid cloud for the tool itself. Closed-source use needs a commercial license ([COMMERCIAL.md](./COMMERCIAL.md)).
+
+Install the MCP, put your provider key in the MCP server `env` via `configure`, and run on your machine.
 
 ## Problem
-- Vague prompts → multi-turn agent thrash and wasted tokens (on top of Cursor/Claude/Copilot bills).
-- Chat-dump optimizers often let the agent keep running.
-- Paying *another* SaaS fee for a thin MCP layer has weak willingness-to-pay; this project is the tool its author would actually use.
+- Vague prompts waste turns and tokens on top of Cursor / Claude / Copilot bills.
+- Prompt “optimizers” that dump text into chat often let the agent keep coding anyway.
+- Another mandatory SaaS fee for a thin rewrite layer is a hard sell. This is meant to be something you would actually run locally.
 
 ## Solution
-1. Host calls `optimize_and_blueprint_intent` with raw prompt + `workspace_root`.
+1. Host calls `optimize_and_blueprint_intent` with the raw prompt and absolute `workspace_root`.
 2. Local MCP gathers light git/fs context.
-3. **User-chosen** LLM (DeepSeek / OpenAI / Anthropic / any OpenAI-compatible endpoint) rewrites intent (no code generation).
-4. Overwrite `Agent_Efficiency_MCP.md`; return hard freeze until `GO`.
+3. Your chosen LLM rewrites intent (no code generation).
+4. Overwrite `Agent_Efficiency_MCP.md` and return a hard freeze until `GO`.
 
-## Positioning
-Not a “prompt theater” SaaS. Portfolio-grade OSS for **serious vibe coders** who want quality and control:
-- Agent efficiency / one-shot success
-- Controllable pause before edits
-- Editable blueprint HUD
-
-## Target audience
-**In:** Careful builders who already pay for an IDE/model and won’t add another monthly tool fee — but will run a free local MCP with their own key.  
-**Out:** Speed-only slop workflows that reject any `GO` friction.
+## Who it is for
+**In:** People who already pay for an IDE or model, want a review step before edits, and will run a free local MCP with their own key.  
+**Out:** Workflows that refuse any `GO` friction.
 
 ## In scope
-- Local stdio MCP, AGPL-3.0-only (+ commercial dual-license contact)
-- BYOK providers: DeepSeek, OpenAI, Anthropic, Gemini, xAI/Grok, local/LAN OpenAI-compat, plus generic `openai_compat` / `auto`
-- Composable `@promptmcp:` directives (`include`, `file`, `media`, `search`, `long`, …)
-- Media vision for vision-capable providers; SSRF-safe URL enrich; blueprint history
-- `Agent_Efficiency_MCP.md` + freeze + consumer rules + `/optimize` + `doctor` CLI
-- Eval/smoke/unit tests + CI
+- Local stdio MCP, AGPL-3.0-only, commercial dual-license contact
+- BYOK providers: DeepSeek, OpenAI, Anthropic, Gemini, xAI/Grok, local/LAN OpenAI-compat, `openai_compat`, `auto`
+- `@promptmcp:` directives (`include`, `file`, `media`, `search`, `long`, …)
+- Media vision where the provider supports it, SSRF-safe URL enrich, blueprint history
+- Freeze rules, `/optimize` recovery, `doctor` CLI
+- Eval, smoke, unit tests, CI
 
 ## Out of scope
-- PromptMCP-hosted paid tiers, Stripe trials, cloud metering SaaS
+- Hosted paid tiers, Stripe trials, cloud metering
 - Custom Cursor Accept/Reject UI (platform limit)
-- Guaranteeing every host model auto-calls the tool (soft compliance)
+- Guaranteeing every host model auto-calls the tool (soft compliance only)
 
-## Success metrics
-- GitHub stars / forks / useful issues (portfolio + community)
-- Users complete install → first `GO` loop in &lt;15 minutes
-- Blueprint quality with BYOK providers
-- Optional: personal daily use as dogfood
+## Success signals
+- Clean install to first `GO` in under 15 minutes
+- Blueprint quality with real BYOK providers
+- Useful issues and PRs
+- Daily personal use as dogfood

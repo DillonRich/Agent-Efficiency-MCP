@@ -1,19 +1,19 @@
-# Quality & cross-model accuracy
+# Quality
 
 ## Rewrite quality
 
-The engine builds a **professional agent task brief** (goal · constraints · non-goals · targeted paths · verification), tuned per provider dialect + **prompt archetype** (vague, overconstrained, contradictory, long, multi-goal, …).
+The engine builds a short agent task brief (goal, constraints, non-goals, targeted paths, verification). Output is tuned by provider dialect and prompt archetype (vague, overconstrained, contradictory, long, multi-goal, and similar).
 
 | Layer | Role |
 |-------|------|
-| `CENTRAL_COMPRESSION_PROMPT` | Schema + token-efficiency rules |
-| Provider dialect | Format compliance quirks |
-| Archetype strategy | Handling messy/vague/conflict prompts |
+| `CENTRAL_COMPRESSION_PROMPT` | Schema and token-efficiency rules |
+| Provider dialect | Format quirks per API |
+| Archetype strategy | Handling messy or conflicting prompts |
 | Quality rubric | Self-check before finish |
-| Boundary post-process | Inject Non-goals / strip tour bullets |
-| Validation repair | One retry on section/path failure |
+| Boundary post-process | Inject non-goals, strip tour bullets |
+| Validation repair | One retry on section or path failure |
 
-Metrics in `Agent_Efficiency_MCP.md` are factual (`PROMPTMCP_META`) — never hallucinated time-saved. Includes `archetype` + `compression_ratio`.
+Metrics in `Agent_Efficiency_MCP.md` are factual (`PROMPTMCP_META`). No invented “time saved” numbers. Includes `archetype` and `compression_ratio`.
 
 ## Quantitative gates (R1–R10)
 
@@ -25,22 +25,22 @@ npm run quality-loop -- --eval # + DeepSeek eval
 npm run eval -- --provider deepseek
 ```
 
-Targets: mean composite ≥ 80; R1/R3 ≥ 95%; R6/R9 ≥ 90%; 0 hard fails.
+Targets: mean composite ≥ 80, R1/R3 ≥ 95%, R6/R9 ≥ 90%, 0 hard fails.
 
-## Host gate success ratio
+## Host gate success
 
-MCP cannot force tool calls. Success rate rises with PRIORITY 0 rules, host tips, `/optimize`, and Agent modes with tools enabled.
+MCP cannot force tool calls. Rates improve with PRIORITY 0 rules, host tips, `/optimize`, and Agent modes that allow tools.
 
 ## Recommended presets
 
-| Goal | Suggested config |
-|------|------------------|
-| Cheap daily driver | `REWRITE_PROVIDER=deepseek` + `DEEPSEEK_MODEL=flash` |
+| Goal | Config |
+|------|--------|
+| Cheap daily driver | `REWRITE_PROVIDER=deepseek` + flash model |
 | Higher fidelity rewrite | Anthropic Sonnet or OpenAI 4.1 |
-| Private | `REWRITE_PROVIDER=local` + strong coder model (14B+) |
+| Private | `REWRITE_PROVIDER=local` + a strong coder model (14B+) |
 | Path-critical tasks | `@promptmcp:strict @promptmcp:file[...]` |
 | Nuance retention | `@promptmcp:include` |
 
-## Soft / known limits
+## Soft limits
 - Host models may skip the MCP
-- Cannot protocol-force slot-one tool calls
+- Slot-one tool calls cannot be protocol-enforced

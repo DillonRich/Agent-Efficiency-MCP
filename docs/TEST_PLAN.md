@@ -1,8 +1,8 @@
-# Test Plan — Functional MVP
+# Test plan
 
 ## Automated smoke (no Cursor)
 
-From the PromptMCP repo:
+From this repo:
 
 ```bash
 npm run build

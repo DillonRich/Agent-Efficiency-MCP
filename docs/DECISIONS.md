@@ -18,10 +18,10 @@ User-facing tags (`ignore`, `include`, `file`, `media`, `search`, `long`, `short
 
 ---
 
-## 2026-07-22 — Pivot to open-source local BYOK (no paid SaaS; later AGPL)
+## 2026-07-22 - Pivot to open-source local BYOK (later AGPL)
 **Status:** Accepted  
 
-Research + founder ICP: thin paid MCP add-ons convert poorly; users already pay Cursor/Claude/Copilot; easy to clone. PromptMCP becomes a **self-sufficient local MCP**: install, put your own API key in env, run. Goal = GitHub stars + portfolio + personal use — not subscription ARR. Commercial Stripe/Azure multi-tenant plans are **superseded / cancelled**.
+Thin paid MCP add-ons convert poorly. Users already pay for Cursor/Claude/Copilot. The product is a local MCP: install, put your own API key in MCP env, run. Goals are adoption and personal use, not subscription ARR. Stripe/Azure multi-tenant plans are cancelled.
 
 ---
 
@@ -39,10 +39,10 @@ Was: prices ~$15 / $25 / $40, 10-day trial with card. Cancelled — see pivot en
 
 ---
 
-## 2026-07-22 — Pursue as focused product; expect fast copy / platform nibble
+## 2026-07-22 - Focused product, expect clones
 **Status:** Accepted (reframed for OSS)
 
-PromptMCP adds real vibe-coding value (rewrite + approve + freeze). It is not a permanent moat — others can clone it. Worth owning the open-source reference implementation for portfolio + personal use; do not depend on secrecy of the idea.
+Rewrite + approve + freeze is useful. It is not a moat. Others can clone it. Own a clear open-source reference implementation. Do not depend on secrecy of the idea.
 
 ---
 
