@@ -22,15 +22,24 @@ export function addUsage(a: TokenUsage, b?: TokenUsage | null): TokenUsage {
 export function parseOpenAiUsage(raw: unknown): TokenUsage | undefined {
   if (!raw || typeof raw !== "object") return undefined;
   const u = raw as Record<string, unknown>;
-  const prompt = Number(u.prompt_tokens ?? u.input_tokens ?? 0);
-  const completion = Number(u.completion_tokens ?? u.output_tokens ?? 0);
-  const total = Number(u.total_tokens ?? prompt + completion);
-  if (!Number.isFinite(prompt) && !Number.isFinite(completion)) return undefined;
+  const prompt = Number(u.prompt_tokens ?? u.input_tokens ?? 0) || 0;
+  let completion = Number(u.completion_tokens ?? u.output_tokens ?? 0) || 0;
+  // Some thinking responses nest reasoning under completion_tokens_details
+  const details = u.completion_tokens_details;
+  if (
+    details &&
+    typeof details === "object" &&
+    completion <= 0
+  ) {
+    const r = Number((details as { reasoning_tokens?: number }).reasoning_tokens);
+    if (Number.isFinite(r) && r > 0) completion = r;
+  }
+  const total = Number(u.total_tokens ?? 0) || prompt + completion;
   if (prompt <= 0 && completion <= 0) return undefined;
   return {
-    promptTokens: Math.max(0, prompt || 0),
-    completionTokens: Math.max(0, completion || 0),
-    totalTokens: Math.max(0, total || prompt + completion),
+    promptTokens: Math.max(0, prompt),
+    completionTokens: Math.max(0, completion),
+    totalTokens: Math.max(0, total),
   };
 }
 

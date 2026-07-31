@@ -1,6 +1,6 @@
 {
   "name": "agent-efficiency-mcp",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Agent Efficiency Engine — local BYOK MCP that rewrites messy prompts into Agent_Efficiency_MCP.md and freezes until GO.",
   "type": "module",
   "main": "dist/server.js",

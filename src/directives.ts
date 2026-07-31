@@ -93,6 +93,58 @@ function uniq(items: string[]): string[] {
   return out;
 }
 
+const PROJECT_PATH_ROOTS = new Set([
+  "src",
+  "test",
+  "tests",
+  "doc",
+  "docs",
+  "lib",
+  "app",
+  "apps",
+  "package",
+  "packages",
+  "script",
+  "scripts",
+  "tool",
+  "tools",
+  "models",
+  "data",
+  "logs",
+  "dist",
+  "build",
+  "fixture",
+  "fixtures",
+  "template",
+  "templates",
+  "asset",
+  "assets",
+  "public",
+  "private",
+  "cmd",
+  "internal",
+  "pkg",
+  "website",
+  "cloudflare-worker",
+  "e2e",
+  "wiremaps",
+  "markdown files",
+]);
+
+/**
+ * Reject English "a/b" phrases that look like paths but are not filesystem refs
+ * (e.g. start/end, P0/P1, model/scanner, Rust/Tauri).
+ */
+export function looksLikeFilesystemPath(token: string): boolean {
+  const t = token.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+  if (!t || !t.includes("/")) return false;
+  // Real files almost always have an extension
+  if (/\.[A-Za-z0-9]{1,12}$/.test(t)) return true;
+  // Extension-less paths: only if the first segment is a real project root dir
+  const first = (t.split("/")[0] || "").toLowerCase();
+  return PROJECT_PATH_ROOTS.has(first);
+}
+
 /**
  * Extract path-like tokens from free text (implicit force-include).
  */
@@ -100,7 +152,7 @@ export function extractPathLikeTokens(text: string): string[] {
   const found: string[] = [];
   for (const m of text.matchAll(PATH_LIKE_RE)) {
     const token = m[1]?.replace(/\\/g, "/");
-    if (token) found.push(token);
+    if (token && looksLikeFilesystemPath(token)) found.push(token);
   }
   return uniq(found);
 }

@@ -57,8 +57,18 @@ export function ensureVerificationLanguage(
   if (!m) return { text: blueprint, injected: false };
 
   const body = m[1] || "";
+  const whole = blueprint;
+  // Analysis-only / no-source-edit cycles: do not inject build/test boilerplate
   if (
-    /\b(test|typecheck|build|lint|compile|npm|pytest|cargo|go test)\b/i.test(
+    /\b(analysis-only|do not edit|without editing|zero source|no source edits|read only|read-only)\b/i.test(
+      whole,
+    )
+  ) {
+    return { text: blueprint, injected: false };
+  }
+
+  if (
+    /\b(test|typecheck|build|lint|compile|npm|pytest|cargo|go test|git status|git diff|observable)\b/i.test(
       body,
     )
   ) {
@@ -72,8 +82,8 @@ export function ensureVerificationLanguage(
         "- [ ] `npm test` passes (or add a focused assertion for this change)",
       ]
     : [
-        "- [ ] Project build/typecheck command passes",
-        "- [ ] Add or run a focused test proving the Absolute Objective",
+        "- [ ] Project test/lint command from `pyproject.toml` (or package.json) passes",
+        "- [ ] Observable behavior matches Absolute Objective",
       ];
 
   const injection = extras.join("\n");

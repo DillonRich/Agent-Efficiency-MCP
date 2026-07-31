@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-07-30 — 1.4.7 HQ-prompt polish
+- Stop treating English `a/b` phrases (`start/end`, `P0/P1`, `Rust/Tauri`) as forced paths
+- Depth scaling in quality rubric (short asks stay compact; long/novel can expand)
+- Skip generic build/test verification injection on analysis-only blueprints
+- Harder usage parsing for thinking-mode token details
+
 ## 2026-07-30 — 1.4.6 Sync configure keys into global Cursor MCP
 - `configure` patches `~/.cursor/mcp.json` when our server is already registered there (fixes dual-entry empty-env failures)
 - Clearer “no provider” error: MCP env / configure, not package `.env` for npx consumers

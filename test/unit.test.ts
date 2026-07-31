@@ -237,6 +237,10 @@ import {
   expandModelAlias,
   parseModelSpec,
 } from "../src/providers/model.js";
+import {
+  extractPathLikeTokens,
+  looksLikeFilesystemPath,
+} from "../src/directives.js";
 
 describe("provider + model aliases", () => {
   it("normalizes messy provider names", () => {
@@ -254,6 +258,22 @@ describe("provider + model aliases", () => {
     const spec = parseModelSpec("pro:max");
     assert.equal(expandModelAlias(spec.modelRaw), "deepseek-v4-pro");
     assert.equal(spec.effort, "max");
+  });
+});
+
+describe("implicit path extraction", () => {
+  it("keeps real paths and drops English a/b phrases", () => {
+    assert.equal(looksLikeFilesystemPath("src/scanner.py"), true);
+    assert.equal(looksLikeFilesystemPath("README.md"), false); // no slash
+    assert.equal(looksLikeFilesystemPath("start/end"), false);
+    assert.equal(looksLikeFilesystemPath("P0/P1"), false);
+    assert.equal(looksLikeFilesystemPath("model/scanner"), false);
+    assert.equal(looksLikeFilesystemPath("Rust/Tauri"), false);
+    const tokens = extractPathLikeTokens(
+      "Wire cache in src/engine.py and ignore start/end plus P0/P1 labels",
+    );
+    assert.ok(tokens.some((t) => t.includes("src/engine.py")));
+    assert.ok(!tokens.some((t) => /start\/end|P0\/P1/i.test(t)));
   });
 });
 

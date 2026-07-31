@@ -13,13 +13,16 @@ import {
  */
 export const QUALITY_RUBRIC = `
 ## SELF-CHECK BEFORE YOU FINISH (mandatory)
-- [ ] Absolute Objective is ONE imperative sentence (≤ ~240 chars).
+- [ ] Absolute Objective is ONE imperative sentence (≤ ~240 chars) that preserves the user's exact scope — do not invent extra work.
+- [ ] DEPTH SCALING: short/precise asks → compact requirements (prefer ≤ ~8 bullets in §2, ≤ ~4 vectors in §3). Long/novel asks or LONG mode → more phases and richer verification. Do NOT pad short asks to a fixed length.
+- [ ] If the user prompt is already precise, keep their constraints verbatim; structure them — do not "improve" by expanding scope.
 - [ ] Section 2 includes at least one Non-goals / out-of-scope bullet when the ask is vague, huge, or conflicting.
 - [ ] Section 3 paths appear in Known Path Tokens / Forced User Files — never invented; ≤ 6 bullets unless forced paths require more.
+- [ ] Cite only real filesystem paths (e.g. src/foo.py, README.md). Never treat English pairs like start/end, P0/P1, model/scanner as paths.
 - [ ] Every Forced User File and Forced Media path is cited.
 - [ ] Every Forced Research URL is listed (if any).
 - [ ] No fenced code blocks (\`\`\`) and no application source code.
-- [ ] Verification Checkpoints are concrete and testable (mention test/typecheck/build/observable behavior).
+- [ ] Verification Checkpoints match the job: analysis-only → git-clean / citation checks; code changes → real test commands from the project. No generic boilerplate that does not fit.
 - [ ] No tour language ("explore the codebase", "look around", "read everything").
 - [ ] No "minutes saved" / "hours saved" / fake productivity estimates.
 - [ ] Output matches the required markdown section headers (1–4) plus approval footer.
