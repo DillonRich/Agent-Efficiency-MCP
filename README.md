@@ -38,16 +38,29 @@ Then:
 
 | Command | What it does |
 |---------|----------------|
-| `init` | Registers project MCP + PRIORITY 0 rules + blueprint stub |
-| `configure` | Writes provider + key into IDE MCP config (gitignored) |
+| `init` | Writes the project files below (merge-safe) |
+| `configure` | Adds provider + key into the MCP server `env` in that JSON |
 | `doctor` | Checks that install and keys look ready |
 
-**Default IDE:** Cursor project config (`.cursor/mcp.json`).  
-**VS Code / Copilot:** `init --project . --hosts vscode` (writes `.vscode/mcp.json`).  
-**Also global Cursor:** add `--also-global`.  
-**Several hosts:** `--hosts all`.
+### What `npx … init` writes into your project
 
-Keys live in the MCP server `env` block. They are **not** written to your app `.env`.
+`npx` does not leave a permanent install in your app. The CLI runs, then writes (or merges) these files so the IDE can load the tool:
+
+| Path | Purpose |
+|------|---------|
+| `.cursor/mcp.json` (default) or `.vscode/mcp.json` (`--hosts vscode`) | MCP server entry (`agent-efficiency-engine`) so the IDE can start it |
+| `.cursor/rules/00-promptmcp.mdc` | PRIORITY 0 rules that tell the agent to call the tool first, then freeze until `GO` |
+| `Agent_Efficiency_MCP.md` | Blueprint stub (overwritten later on each optimize) |
+| `.gitignore` entries | Adds the project MCP json path(s) so keys are less likely to be committed |
+
+It may also upsert a small marked block into existing `.cursorrules` / `AGENTS.md` / Copilot instructions if those files already exist. Other MCP servers and other rules are left alone.
+
+`configure` then puts your API key and model into the **MCP server `env` block inside that json** (IDE-scoped secrets for this tool only). We do **not** create or edit your app’s `.env`.
+
+**Default IDE:** Cursor project (`.cursor/mcp.json`).  
+**VS Code / Copilot:** `init --project . --hosts vscode`.  
+**Also global Cursor:** `--also-global`.  
+**Several hosts:** `--hosts all`.
 
 If the agent skips the gate, type `/optimize` or say `run the efficiency engine`.  
 To skip the gate for one message: `@promptmcp:ignore your question here`.

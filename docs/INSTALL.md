@@ -33,7 +33,20 @@ npx agent-efficiency-mcp@latest configure --project . --provider anthropic --api
 | Prompt → GO | Rewrite, freeze, you approve, agent executes |
 | Skip | `/optimize` or `run the efficiency engine` |
 
-`configure` only writes the MCP server `env` block. No project-root `.env` is required for the npx path.
+### What gets written (transparency)
+
+`npx agent-efficiency-mcp@latest init` runs from npm’s cache. It does not permanently install the package into your app. It **does** create or merge:
+
+| File | Role |
+|------|------|
+| `.cursor/mcp.json` or `.vscode/mcp.json` | MCP registration for `agent-efficiency-engine` |
+| `.cursor/rules/00-promptmcp.mdc` | PRIORITY 0 gate / freeze rules |
+| `Agent_Efficiency_MCP.md` | Blueprint stub (if missing) |
+| `.gitignore` | Ignores project MCP json paths that may hold keys |
+
+Optional upserts into existing `.cursorrules`, `AGENTS.md`, or Copilot instructions. Other servers/rules stay.
+
+`configure` writes provider, model, and API key into the MCP entry’s **`env`** inside that json. There is **no** separate tool `.env` and **no** app-root `.env` from us.
 
 ### Cursor vs VS Code
 
