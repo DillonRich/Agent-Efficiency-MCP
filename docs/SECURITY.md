@@ -20,4 +20,4 @@
 - Prefer `npm ci` in CI.
 
 ## Reporting
-See root [SECURITY.md](../SECURITY.md). Email **knextdr@gmail.com**. Do not file public issues with exploit details.
+See root [SECURITY.md](../SECURITY.md). Use GitHub private vulnerability reporting. Do not file public issues with exploit details.

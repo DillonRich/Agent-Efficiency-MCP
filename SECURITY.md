@@ -4,7 +4,7 @@
 Security fixes land on the latest `agent-efficiency-mcp` release on GitHub and npm.
 
 ## Reporting a vulnerability
-Email **knextdr@gmail.com** with subject `Security report - Agent Efficiency MCP`.
+Use GitHub’s private vulnerability reporting on this repository (Security tab → Report a vulnerability).
 
 Include:
 
@@ -13,8 +13,6 @@ Include:
 - Impact (data exposure, SSRF, path escape, etc.)
 
 Do not open a public GitHub issue for unfixed vulnerabilities.
-
-We aim to acknowledge reports within a few days.
 
 ## Design boundaries
 - Local BYOK. Prompts go to your chosen LLM API or local model, not our servers.

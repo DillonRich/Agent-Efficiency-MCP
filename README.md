@@ -149,4 +149,4 @@ npm install && npm run build
 npm test
 ```
 
-Proprietary licensing: **knextdr@gmail.com**
+Proprietary licensing: open a GitHub Discussion (see [docs/COMMERCIAL.md](docs/COMMERCIAL.md)).

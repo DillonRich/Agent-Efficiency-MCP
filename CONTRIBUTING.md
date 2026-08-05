@@ -34,11 +34,11 @@ npm publish --access public
 Closed-source licensing: [docs/COMMERCIAL.md](docs/COMMERCIAL.md).
 
 ## Contact
-Questions, suggestions, or partnership ideas: **knextdr@gmail.com**
+Use GitHub only (no public email on this project):
 
-- Prefer GitHub Issues / Discussions for public bugs and feature ideas when you can.
-- Security reports: [SECURITY.md](./SECURITY.md) (email, not a public issue).
-- Proprietary licensing: same inbox, subject `Commercial license inquiry - Agent Efficiency MCP`.
+- Bugs / features: Issues or Discussions
+- Security: [SECURITY.md](./SECURITY.md) (private vulnerability reporting)
+- Proprietary licensing: Discussions (see [docs/COMMERCIAL.md](docs/COMMERCIAL.md))
 
 ## Conduct
 Be respectful. No harassment.

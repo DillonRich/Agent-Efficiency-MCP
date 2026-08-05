@@ -41,7 +41,7 @@
     "windsurf",
     "vscode"
   ],
-  "author": "Dillon Rich <knextdr@gmail.com>",
+  "author": "Dillon Rich",
   "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=20"
