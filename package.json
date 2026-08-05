@@ -64,12 +64,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git"
+    "url": "git+https://github.com/DillonRich/Agent-Efficiency-MCP.git"
   },
   "bugs": {
-    "url": "https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP/issues"
+    "url": "https://github.com/DillonRich/Agent-Efficiency-MCP/issues"
   },
-  "homepage": "https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP#readme",
+  "homepage": "https://github.com/DillonRich/Agent-Efficiency-MCP#readme",
   "publishConfig": {
     "access": "public"
   },

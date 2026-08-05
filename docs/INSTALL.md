@@ -62,7 +62,7 @@ npx agent-efficiency-mcp@latest configure --project . --hosts vscode --provider 
 ## Build from a clone
 
 ```bash
-git clone https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git
+git clone https://github.com/DillonRich/Agent-Efficiency-MCP.git
 cd Agent-Efficiency-MCP
 npm install
 cp .env.example .env

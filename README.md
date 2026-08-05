@@ -143,7 +143,7 @@ See `.env.example` and [docs/ENGINE.md](docs/ENGINE.md).
 ## Develop this package
 
 ```bash
-git clone https://github.com/Agent-Efficiency-MCP/Agent-Efficiency-MCP.git
+git clone https://github.com/DillonRich/Agent-Efficiency-MCP.git
 cd Agent-Efficiency-MCP
 npm install && npm run build
 npm test
