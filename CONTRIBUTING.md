@@ -34,7 +34,7 @@ npm publish --access public
 Closed-source licensing: [docs/COMMERCIAL.md](docs/COMMERCIAL.md).
 
 ## Contact
-Questions, suggestions, or partnership ideas: **AgentEfficiencyMCP@gmail.com**
+Questions, suggestions, or partnership ideas: **knextdr@gmail.com**
 
 - Prefer GitHub Issues / Discussions for public bugs and feature ideas when you can.
 - Security reports: [SECURITY.md](./SECURITY.md) (email, not a public issue).

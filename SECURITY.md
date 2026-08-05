@@ -4,7 +4,7 @@
 Security fixes land on the latest `agent-efficiency-mcp` release on GitHub and npm.
 
 ## Reporting a vulnerability
-Email **AgentEfficiencyMCP@gmail.com** with subject `Security report - Agent Efficiency MCP`.
+Email **knextdr@gmail.com** with subject `Security report - Agent Efficiency MCP`.
 
 Include:
 

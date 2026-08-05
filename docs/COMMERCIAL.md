@@ -5,7 +5,7 @@ Two tracks:
 1. **AGPL-3.0-only** for open and community use (share-alike applies).
 2. **Commercial license** for closed-source or proprietary use, under negotiated terms.
 
-Contact: **AgentEfficiencyMCP@gmail.com**  
+Contact: **knextdr@gmail.com**  
 Subject: `Commercial license inquiry - Agent Efficiency MCP`
 
 ## What AGPL means here

@@ -9,7 +9,7 @@ We pledge to make participation in this project a harassment-free experience for
 - Focus on what is best for the community
 
 ## Enforcement
-Report unacceptable behavior to **AgentEfficiencyMCP@gmail.com**.
+Report unacceptable behavior to **knextdr@gmail.com**.
 
 ## Attribution
 Adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1.

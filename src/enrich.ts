@@ -74,7 +74,7 @@ async function fetchTitleSnippet(
         method: "GET",
         headers: {
           "User-Agent":
-            "AgentEfficiencyMCP/1.4 (+local BYOK enrich; respectful fetch)",
+            "agent-efficiency-mcp/1.4 (+local BYOK enrich; respectful fetch)",
           Accept: "text/html,application/xhtml+xml",
         },
         redirect: "manual",

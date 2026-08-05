@@ -149,4 +149,4 @@ npm install && npm run build
 npm test
 ```
 
-Proprietary licensing: **AgentEfficiencyMCP@gmail.com**
+Proprietary licensing: **knextdr@gmail.com**

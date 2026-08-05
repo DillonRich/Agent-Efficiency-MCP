@@ -41,7 +41,7 @@
     "windsurf",
     "vscode"
   ],
-  "author": "Agent Efficiency MCP <AgentEfficiencyMCP@gmail.com>",
+  "author": "Dillon Rich <knextdr@gmail.com>",
   "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=20"
